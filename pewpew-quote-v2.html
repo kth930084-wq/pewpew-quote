@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEWPEW STUDIO 견적표</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: #fff;
+            color: #1a1a1a;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        .page {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 50px;
+            background: #fff;
+        }
+
+        /* 플로팅 가격표 - 우측 중앙 */
+        .floating-price {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            background: rgba(26, 26, 26, 0.95);
+            color: #fff;
+            padding: 20px 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            z-index: 1000;
+            min-width: 200px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .floating-price:hover {
+            background: rgba(26, 26, 26, 1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .floating-price .label {
+            font-size: 11px;
+            color: #aaa;
+            margin-bottom: 4px;
+        }
+
+        .floating-price .price {
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+        .floating-price .won {
+            font-size: 13px;
+            font-weight: 400;
+        }
+
+        .floating-price .item-count {
+            font-size: 10px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .floating-price .go-form-btn {
+            display: block;
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #fff;
+            color: #1a1a1a;
+            text-align: center;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .floating-price .go-form-btn:hover {
+            background: #f0f0f0;
+        }
+
+        /* Header - 표지 페이지 */
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #1a1a1a;
+        }
+
+        /* 표지 페이지 스타일 */
+        .cover-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 85vh;
+            text-align: center;
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .cover-page .logo {
+            font-size: 48px;
+            letter-spacing: 10px;
+            margin-bottom: 20px;
+        }
+
+        .cover-page .tagline {
+            font-size: 14px;
+            letter-spacing: 4px;
+            margin-bottom: 40px;
+        }
+
+        .cover-page .studio-info {
+            font-size: 14px;
+            line-height: 2;
+        }
+
+        .cover-page .doc-title {
+            font-size: 20px;
+            font-weight: 500;
+            color: #333;
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid #ddd;
+        }
+
+        .cover-page .doc-date {
+            font-size: 13px;
+            color: #888;
+            margin-top: 15px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 6px;
+            margin-bottom: 8px;
+        }
+
+        .tagline {
+            font-size: 12px;
+            color: #888;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .studio-info {
+            font-size: 13px;
+            color: #555;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 45px;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+            color: #1a1a1a;
+            letter-spacing: 0.5px;
+        }
+
+        .section-subtitle {
+            font-size: 12px;
+            color: #888;
+            font-weight: 400;
+            margin-left: 10px;
+        }
+
+        .time-label {
+            font-size: 14px;
+            font-weight: 700;
+            margin: 30px 0 15px;
+            color: #fff;
+            background: #1a1a1a;
+            padding: 12px 20px;
+            display: inline-block;
+            letter-spacing: 1px;
+        }
+
+        .time-label:first-of-type {
+            margin-top: 0;
+        }
+
+        /* 촬영 횟수 드롭다운 */
+        .qty-selector {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #ddd;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .qty-selector label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .qty-selector select {
+            padding: 8px 30px 8px 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 2px solid #1a1a1a;
+            border-radius: 6px;
+            background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231a1a1a' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 10px center;
+            appearance: none;
+            cursor: pointer;
+            min-width: 80px;
+        }
+
+        .qty-selector select:focus {
+            outline: none;
+            border-color: #0066ff;
+        }
+
+        /* Package Grid */
+        .package-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        /* Package Card */
+        .package-card {
+            border: 1px solid #e0e0e0;
+            padding: 25px;
+            position: relative;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .package-card:hover {
+            border-color: #1a1a1a;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .package-card.selected {
+            border: 3px solid #1a1a1a;
+            background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transform: scale(1.02);
+        }
+
+        /* 선택된 패키지 체크 표시 */
+        .package-card.selected::before {
+            content: "✓ 선택됨";
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #1a1a1a;
+            color: #fff;
+            padding: 4px 10px;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 3px;
+            z-index: 10;
+        }
+
+        /* 선택된 패키지 가격 강조 */
+        .package-card.selected .package-price {
+            color: #c00;
+        }
+
+        .package-card.recommended {
+            border: 2px solid #1a1a1a;
+        }
+
+        .package-card.recommended::after {
+            content: "BEST";
+            position: absolute;
+            top: -1px;
+            right: 20px;
+            background: #1a1a1a;
+            color: #fff;
+            padding: 4px 12px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .package-card.light {
+            background: #fafafa;
+        }
+
+        .package-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .package-subtitle {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 15px;
+        }
+
+        .package-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .package-price .won {
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .package-unit {
+            font-size: 11px;
+            color: #888;
+            margin-top: 3px;
+            margin-bottom: 15px;
+        }
+
+        .package-features {
+            list-style: none;
+            font-size: 12px;
+            color: #555;
+        }
+
+        .package-features li {
+            padding: 5px 0;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .package-features li::before {
+            content: "·";
+            position: absolute;
+            left: 0;
+            color: #1a1a1a;
+            font-weight: 700;
+        }
+
+        .package-features li.highlight {
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        /* Checkbox Styles */
+        .checkbox-wrapper {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            cursor: pointer;
+            accent-color: #1a1a1a;
+        }
+
+        .checkbox-label {
+            flex: 1;
+            cursor: pointer;
+        }
+
+        /* Tip Box */
+        .tip-box {
+            background: #f8f8f8;
+            border-left: 3px solid #1a1a1a;
+            padding: 15px 18px;
+            font-size: 12px;
+            color: #555;
+            margin-top: 15px;
+            line-height: 1.8;
+        }
+
+        .tip-box strong {
+            color: #1a1a1a;
+        }
+
+        .tip-box.highlight {
+            background: #fffbf0;
+            border-left-color: #e6a700;
+        }
+
+        .tip-box.warning {
+            background: #fff5f5;
+            border-left-color: #e74c3c;
+        }
+
+        /* Upgrade Note */
+        .upgrade-note {
+            background: #f0f7ff;
+            border: 1px dashed #4a90d9;
+            padding: 10px 14px;
+            font-size: 11px;
+            color: #2c5aa0;
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        /* Option Section */
+        .option-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .option-group h4 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #1a1a1a;
+        }
+
+        /* Option Item with Quantity */
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .option-item:last-child {
+            border-bottom: none;
+        }
+
+        .option-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            margin-right: 10px;
+            cursor: pointer;
+            accent-color: #1a1a1a;
+        }
+
+        .option-item .option-info {
+            flex: 1;
+        }
+
+        .option-item .option-name {
+            font-size: 12px;
+            color: #444;
+        }
+
+        .option-item .option-note {
+            font-size: 10px;
+            color: #999;
+        }
+
+        .option-item .option-price {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1a1a1a;
+            min-width: 100px;
+            text-align: right;
+        }
+
+        /* 수량 선택 컨트롤 */
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 10px;
+        }
+
+        .quantity-control button {
+            width: 28px;
+            height: 28px;
+            border: 1px solid #ddd;
+            background: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .quantity-control button:hover {
+            background: #1a1a1a;
+            color: #fff;
+            border-color: #1a1a1a;
+        }
+
+        .quantity-control button:disabled {
+            background: #f5f5f5;
+            color: #ccc;
+            cursor: not-allowed;
+            border-color: #eee;
+        }
+
+        .quantity-control .qty-value {
+            min-width: 30px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .quantity-control .qty-unit {
+            font-size: 11px;
+            color: #888;
+        }
+
+        /* Policy Grid */
+        .policy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .policy-item {
+            background: #f8f8f8;
+            padding: 18px;
+        }
+
+        .policy-item h4 {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+        }
+
+        .policy-item p,
+        .policy-item li {
+            font-size: 11px;
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .policy-item ul {
+            list-style: none;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: #eee;
+            margin: 25px 0;
+        }
+
+        /* 견적 요청 폼 */
+        .quote-form-section {
+            background: #f8f8f8;
+            padding: 30px;
+            margin-top: 40px;
+            border: 2px solid #1a1a1a;
+        }
+
+        .quote-form-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        /* 총 견적 표시 */
+        .total-estimate {
+            background: #1a1a1a;
+            color: #fff;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .total-label {
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .total-price {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .total-price .won {
+            font-size: 18px;
+            font-weight: 400;
+        }
+
+        .selected-items {
+            font-size: 11px;
+            color: #aaa;
+            margin-top: 10px;
+            line-height: 1.6;
+        }
+
+        /* 폼 스타일 */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #333;
+        }
+
+        .form-group label .required {
+            color: #e74c3c;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            font-size: 13px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #1a1a1a;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* 스케줄 확인 버튼 */
+        .schedule-btn {
+            display: inline-block;
+            background: #fff;
+            border: 1px solid #1a1a1a;
+            color: #1a1a1a;
+            padding: 10px 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            margin-bottom: 15px;
+            transition: all 0.2s;
+        }
+
+        .schedule-btn:hover {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        /* 제출 버튼 */
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: #1a1a1a;
+            color: #fff;
+            border: none;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            background: #333;
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* 예상 견적 안내 */
+        .estimate-notice {
+            margin-top: 15px;
+            padding: 12px;
+            background: #fff5f5;
+            border: 1px solid #ffcdd2;
+            font-size: 11px;
+            color: #c62828;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 50px;
+            padding-top: 25px;
+            border-top: 2px solid #1a1a1a;
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            margin-bottom: 12px;
+        }
+
+        .footer-contact {
+            font-size: 12px;
+            color: #666;
+            line-height: 2;
+        }
+
+        .footer-contact a {
+            color: #1a1a1a;
+            text-decoration: none;
+        }
+
+        .footer-note {
+            margin-top: 15px;
+            font-size: 10px;
+            color: #aaa;
+            line-height: 1.8;
+        }
+
+        /* Print */
+        @media print {
+            .quote-form-section {
+                display: none;
+            }
+            .floating-price {
+                display: none;
+            }
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .page {
+                padding: 15px 30px;
+            }
+            .section {
+                margin-bottom: 25px;
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            .package-card {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            .page-break {
+                page-break-before: always;
+                break-before: page;
+            }
+        }
+
+        .small {
+            font-size: 10px;
+            color: #999;
+        }
+
+        /* 스튜디오 갤러리 */
+        .studio-gallery {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 6px;
+            aspect-ratio: 4/3;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gallery-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            color: #fff;
+            font-size: 11px;
+            padding: 20px 10px 8px;
+            text-align: center;
+        }
+
+        .studio-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 20px;
+            font-size: 12px;
+            color: #555;
+        }
+
+        .studio-features span {
+            white-space: nowrap;
+        }
+
+        /* 성공/에러 메시지 */
+        .message {
+            padding: 15px;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 13px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .page {
+                padding: 30px 20px;
+            }
+            .package-grid {
+                grid-template-columns: 1fr;
+            }
+            .option-grid {
+                grid-template-columns: 1fr;
+            }
+            .policy-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .cover-page .logo {
+                font-size: 32px;
+                letter-spacing: 6px;
+            }
+            .floating-price {
+                top: auto;
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+                transform: none;
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 플로팅 가격표 -->
+    <div class="floating-price" id="floatingPrice">
+        <div class="label">예상 견적 (VAT 별도)</div>
+        <div class="price"><span id="floating-total">0</span><span class="won">원</span></div>
+        <div class="item-count" id="floating-count">선택된 항목 없음</div>
+        <a href="#quote-form" class="go-form-btn">견적 요청하기 →</a>
+    </div>
+
+    <div class="page">
+        <!-- 표지 페이지 -->
+        <header class="header cover-page">
+            <div class="logo">PEWPEW STUDIO</div>
+            <div class="tagline">Commercial Photography & Videography</div>
+            <div class="studio-info">
+                성수동 116평 · 대형 호리존 · 주차 가능 · 화물 E/V
+            </div>
+            <div class="doc-title">서비스 안내 및 견적서</div>
+            <div class="doc-date">2026</div>
+        </header>
+
+        <!-- 표지 후 페이지 나눔 -->
+        <div class="page-break"></div>
+
+        <!-- 1. 사진 촬영 패키지 -->
+        <section class="section">
+            <h2 class="section-title">01. 사진 촬영 패키지</h2>
+
+            <!-- Half-day -->
+            <p class="time-label">HALF-DAY (4시간)</p>
+            <div class="package-grid">
+                <div class="package-card light" onclick="togglePhotoPackage(this, 'photo-half-light')">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="photo-half-light" data-price="1500000" data-name="[사진] Half-day Light" data-type="light" onclick="event.stopPropagation()">
+                        <label class="checkbox-label">
+                            <div class="package-name">Light</div>
+                            <div class="package-subtitle">소규모 촬영에 적합</div>
+                        </label>
+                    </div>
+                    <div class="package-price">1,500,000<span class="won">원</span></div>
+                    <div class="package-unit">리터칭 컷당 375,000원</div>
+                    <ul class="package-features">
+                        <li>촬영 시간 4시간</li>
+                        <li>리터칭 4컷 포함</li>
+                        <li>촬영 원본 전체 제공</li>
+                        <li>리터칭 컷 2회 수정 포함</li>
+                    </ul>
+                    <div class="upgrade-note">
+                        추가 리터칭 불가 · 추가 컷 필요 시 Standard 권장
+                    </div>
+                    <div class="qty-selector" id="qty-photo-half-light" style="display: none;">
+                        <label>촬영 횟수:</label>
+                        <select onchange="calculateTotal()">
+                            <option value="1">1회</option>
+                            <option value="2">2회</option>
+                            <option value="3">3회</option>
+                            <option value="4">4회</option>
+                            <option value="5">5회</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="package-card recommended" onclick="togglePhotoPackage(this, 'photo-half-std')">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="photo-half-std" data-price="2000000" data-name="[사진] Half-day Standard" data-type="standard" onclick="event.stopPropagation()">
+                        <label class="checkbox-label">
+                            <div class="package-name">Standard</div>
+                            <div class="package-subtitle">가장 많이 선택하는 구성</div>
+                        </label>
+                    </div>
+                    <div class="package-price">2,000,000<span class="won">원</span></div>
+                    <div class="package-unit">리터칭 컷당 250,000원</div>
+                    <ul class="package-features">
+                        <li>촬영 시간 4시간</li>
+                        <li>리터칭 8컷 포함</li>
+                        <li>촬영 원본 전체 제공</li>
+                        <li>리터칭 컷 2회 수정 포함</li>
+                        <li class="highlight">추가 리터칭 50,000원/컷</li>
+                    </ul>
+                    <div class="qty-selector" id="qty-photo-half-std" style="display: none;">
+                        <label>촬영 횟수:</label>
+                        <select onchange="calculateTotal()">
+                            <option value="1">1회</option>
+                            <option value="2">2회</option>
+                            <option value="3">3회</option>
+                            <option value="4">4회</option>
+                            <option value="5">5회</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- One-day -->
+            <p class="time-label">ONE-DAY (8시간)</p>
+            <div class="package-grid">
+                <div class="package-card light" onclick="togglePhotoPackage(this, 'photo-one-light')">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="photo-one-light" data-price="2800000" data-name="[사진] One-day Light" data-type="light" onclick="event.stopPropagation()">
+                        <label class="checkbox-label">
+                            <div class="package-name">Light</div>
+                            <div class="package-subtitle">8시간 대관 · 소량 리터칭</div>
+                        </label>
+                    </div>
+                    <div class="package-price">2,800,000<span class="won">원</span></div>
+                    <div class="package-unit">리터칭 컷당 약 467,000원</div>
+                    <ul class="package-features">
+                        <li>촬영 시간 8시간</li>
+                        <li>리터칭 6컷 포함</li>
+                        <li>촬영 원본 전체 제공</li>
+                        <li>리터칭 컷 2회 수정 포함</li>
+                    </ul>
+                    <div class="upgrade-note">
+                        추가 리터칭 불가 · Standard가 훨씬 합리적
+                    </div>
+                    <div class="qty-selector" id="qty-photo-one-light" style="display: none;">
+                        <label>촬영 횟수:</label>
+                        <select onchange="calculateTotal()">
+                            <option value="1">1회</option>
+                            <option value="2">2회</option>
+                            <option value="3">3회</option>
+                            <option value="4">4회</option>
+                            <option value="5">5회</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="package-card recommended" onclick="togglePhotoPackage(this, 'photo-one-std')">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="photo-one-std" data-price="3500000" data-name="[사진] One-day Standard" data-type="standard" onclick="event.stopPropagation()">
+                        <label class="checkbox-label">
+                            <div class="package-name">Standard</div>
+                            <div class="package-subtitle">대량 촬영 · 다양한 연출</div>
+                        </label>
+                    </div>
+                    <div class="package-price">3,500,000<span class="won">원</span></div>
+                    <div class="package-unit">리터칭 컷당 약 233,000원</div>
+                    <ul class="package-features">
+                        <li>촬영 시간 8시간</li>
+                        <li>리터칭 15컷 포함</li>
+                        <li>촬영 원본 전체 제공</li>
+                        <li>리터칭 컷 2회 수정 포함</li>
+                        <li class="highlight">추가 리터칭 50,000원/컷</li>
+                    </ul>
+                    <div class="qty-selector" id="qty-photo-one-std" style="display: none;">
+                        <label>촬영 횟수:</label>
+                        <select onchange="calculateTotal()">
+                            <option value="1">1회</option>
+                            <option value="2">2회</option>
+                            <option value="3">3회</option>
+                            <option value="4">4회</option>
+                            <option value="5">5회</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tip-box">
+                <strong>📸 촬영 가이드</strong><br>
+                · 일반 제품 (단순 배경): 4시간 기준 약 10~15컷 촬영 가능<br>
+                · 고난이도 제품 (유광/메탈/투명): 4시간 기준 약 4~6컷 촬영 가능<br>
+                · 촬영 컷 수 제한 없음, 리터칭 컷은 브랜드 측 셀렉 기준
+            </div>
+        </section>
+
+        <!-- 페이지 나눔 -->
+        <div class="page-break"></div>
+
+        <!-- 2. 영상 촬영 패키지 -->
+        <section class="section" style="margin-top: 30px;">
+            <h2 class="section-title">02. 영상 촬영 패키지 <span class="section-subtitle">Standard Only</span></h2>
+
+            <div class="package-grid">
+                <div class="package-card recommended" onclick="togglePackage(this, 'video-half-std')">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="video-half-std" data-price="2000000" data-name="[영상] Half-day Standard" onclick="event.stopPropagation()">
+                        <label class="checkbox-label">
+                            <div class="package-name">Standard</div>
+                            <div class="package-subtitle">Half-day · 4시간</div>
+                        </label>
+                    </div>
+                    <div class="package-price">2,000,000<span class="won">원</span></div>
+                    <div class="package-unit">15초 1편 or 5초 3종</div>
+                    <ul class="package-features">
+                        <li>촬영 시간 4시간</li>
+                        <li>컷편집 + 컬러 그레이딩</li>
+                        <li>자막 + 로고 삽입</li>
+                        <li>2회 수정 포함</li>
+                    </ul>
+                </div>
+
+                <div class="package-card" onclick="togglePackage(this, 'video-one-std')">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="video-one-std" data-price="3500000" data-name="[영상] One-day Standard" onclick="event.stopPropagation()">
+                        <label class="checkbox-label">
+                            <div class="package-name">Standard</div>
+                            <div class="package-subtitle">One-day · 8시간</div>
+                        </label>
+                    </div>
+                    <div class="package-price">3,500,000<span class="won">원</span></div>
+                    <div class="package-unit">30초 1편 or 15초 2편</div>
+                    <ul class="package-features">
+                        <li>촬영 시간 8시간</li>
+                        <li>컷편집 + 컬러 그레이딩</li>
+                        <li>자막 + 로고 삽입</li>
+                        <li>2회 수정 포함</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="tip-box">
+                <strong>🎬 포함 내역</strong><br>
+                기본 컷편집, 컬러 그레이딩, 라이선스 BGM, 자막(기본), 로고 삽입<br>
+                <span class="small">※ 모션그래픽, 3D 효과, 성우 녹음, 유료 폰트는 별도 협의</span>
+            </div>
+        </section>
+
+        <!-- 페이지 나눔 -->
+        <div class="page-break"></div>
+
+        <!-- 3. 사진+영상 패키지 -->
+        <section class="section">
+            <h2 class="section-title">03. 사진 + 영상 패키지 <span class="section-subtitle">동시 촬영 할인</span></h2>
+
+            <!-- Half-day -->
+            <p class="time-label">HALF-DAY (4시간)</p>
+            <div class="package-grid">
+                <div class="package-card light" onclick="toggleComboPackage(this, 'combo-half-light')">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="combo-half-light" data-price="2500000" data-name="[사진+영상] Half-day Light All-in-One" data-type="light" onclick="event.stopPropagation()">
+                        <label class="checkbox-label">
+                            <div class="package-name">Light All-in-One</div>
+                            <div class="package-subtitle">Photo Light + Video 세로형 1편</div>
+                        </label>
+                    </div>
+                    <div class="package-price">2,500,000<span class="won">원</span></div>
+                    <div class="package-unit" style="color: #e67700;">입문용 패키지</div>
+                    <ul class="package-features">
+                        <li>사진 리터칭 4컷</li>
+                        <li>영상 세로형 15초 1편 (수정 불가)</li>
+                        <li>촬영 원본 전체 제공</li>
+                    </ul>
+                    <div class="upgrade-note">
+                        추가 리터칭 불가
+                    </div>
+                    <div class="qty-selector" id="qty-combo-half-light" style="display: none;">
+                        <label>촬영 횟수:</label>
+                        <select onchange="calculateTotal()">
+                            <option value="1">1회</option>
+                            <option value="2">2회</option>
+                            <option value="3">3회</option>
+                            <option value="4">4회</option>
+                            <option value="5">5회</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="package-card recommended" onclick="toggleComboPackage(this, 'combo-half-std')">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="combo-half-std" data-price="3500000" data-name="[사진+영상] Half-day Standard All-in-One" data-type="standard" onclick="event.stopPropagation()">
+                        <label class="checkbox-label">
+                            <div class="package-name">Standard All-in-One</div>
+                            <div class="package-subtitle">Photo Std + Video Std</div>
+                        </label>
+                    </div>
+                    <div class="package-price">3,500,000<span class="won">원</span></div>
+                    <div class="package-unit" style="color: #e67700;">50만원 할인 적용</div>
+                    <ul class="package-features">
+                        <li>사진 리터칭 8컷</li>
+                        <li>영상 15초 3종 or 15초 1편</li>
+                        <li>촬영 원본 전체 제공</li>
+                        <li class="highlight">추가 리터칭 50,000원/컷</li>
+                    </ul>
+                    <div class="qty-selector" id="qty-combo-half-std" style="display: none;">
+                        <label>촬영 횟수:</label>
+                        <select onchange="calculateTotal()">
+                            <option value="1">1회</option>
+                            <option value="2">2회</option>
+                            <option value="3">3회</option>
+                            <option value="4">4회</option>
+                            <option value="5">5회</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- One-day -->
+            <p class="time-label">ONE-DAY (8시간)</p>
+            <div class="package-card recommended" style="max-width: 380px;" onclick="toggleComboPackage(this, 'combo-one-std')">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="combo-one-std" data-price="6000000" data-name="[사진+영상] One-day Standard All-in-One" data-type="standard" onclick="event.stopPropagation()">
+                    <label class="checkbox-label">
+                        <div class="package-name">Standard All-in-One</div>
+                        <div class="package-subtitle">Photo Std + Video Std · 하이엔드 풀패키지</div>
+                    </label>
+                </div>
+                <div class="package-price">6,000,000<span class="won">원</span></div>
+                <div class="package-unit" style="color: #e67700;">정가 7,000,000원 → 1,000,000원 할인</div>
+                <ul class="package-features">
+                    <li>사진 리터칭 15컷</li>
+                    <li>영상 30초 1편 or 15초 2편</li>
+                    <li>촬영 원본 전체 제공</li>
+                    <li class="highlight">추가 리터칭 50,000원/컷</li>
+                </ul>
+                <div class="qty-selector" id="qty-combo-one-std" style="display: none;">
+                    <label>촬영 횟수:</label>
+                    <select onchange="calculateTotal()">
+                        <option value="1">1회</option>
+                        <option value="2">2회</option>
+                        <option value="3">3회</option>
+                        <option value="4">4회</option>
+                        <option value="5">5회</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="tip-box highlight">
+                <strong>💡 왜 All-in-One이 유리한가요?</strong><br>
+                사진과 영상을 동시에 촬영하면 세팅·조명·연출을 공유할 수 있어 현장 효율이 높아집니다.<br>
+                별도 촬영 대비 시간과 비용 모두 절약됩니다.
+            </div>
+        </section>
+
+        <!-- Page Break -->
+        <div class="page-break"></div>
+
+        <!-- 4. 추가 옵션 -->
+        <section class="section" style="margin-top: 30px;">
+            <h2 class="section-title">04. 추가 옵션 <span class="section-subtitle">필요한 옵션과 수량을 선택하세요</span></h2>
+
+            <div class="option-grid">
+                <div class="option-group">
+                    <h4>이미지 후반 작업</h4>
+                    <div class="option-item">
+                        <div class="option-info">
+                            <div class="option-name">추가 리터칭</div>
+                            <div class="option-note">Standard 이상만 · 50,000원/컷</div>
+                        </div>
+                        <div class="quantity-control">
+                            <button type="button" onclick="changeQty('opt-retouch', -1)">−</button>
+                            <span class="qty-value" id="qty-opt-retouch">0</span>
+                            <span class="qty-unit">컷</span>
+                            <button type="button" onclick="changeQty('opt-retouch', 1)">+</button>
+                        </div>
+                        <input type="hidden" id="opt-retouch" data-price="50000" data-name="추가 리터칭" data-qty="0">
+                    </div>
+                    <div class="option-item">
+                        <div class="option-info">
+                            <div class="option-name">누끼컷 (배경 제거)</div>
+                            <div class="option-note">50,000원/컷</div>
+                        </div>
+                        <div class="quantity-control">
+                            <button type="button" onclick="changeQty('opt-nukki', -1)">−</button>
+                            <span class="qty-value" id="qty-opt-nukki">0</span>
+                            <span class="qty-unit">컷</span>
+                            <button type="button" onclick="changeQty('opt-nukki', 1)">+</button>
+                        </div>
+                        <input type="hidden" id="opt-nukki" data-price="50000" data-name="누끼컷" data-qty="0">
+                    </div>
+                    <div class="option-item">
+                        <input type="checkbox" id="opt-special" data-price="80000" data-name="특수재질 누끼컷" onclick="calculateTotal()">
+                        <div class="option-info">
+                            <div class="option-name">특수재질 누끼컷</div>
+                            <div class="option-note">유광/메탈/투명 재질</div>
+                        </div>
+                        <div class="option-price">80,000원</div>
+                    </div>
+                </div>
+
+                <div class="option-group">
+                    <h4>영상 추가 작업</h4>
+                    <div class="option-item">
+                        <div class="option-info">
+                            <div class="option-name">분량 초과 편집</div>
+                            <div class="option-note">100,000원/초</div>
+                        </div>
+                        <div class="quantity-control">
+                            <button type="button" onclick="changeQty('opt-video-extra', -1)">−</button>
+                            <span class="qty-value" id="qty-opt-video-extra">0</span>
+                            <span class="qty-unit">초</span>
+                            <button type="button" onclick="changeQty('opt-video-extra', 1)">+</button>
+                        </div>
+                        <input type="hidden" id="opt-video-extra" data-price="100000" data-name="분량 초과 편집" data-qty="0">
+                    </div>
+                    <div class="option-item">
+                        <div class="option-info">
+                            <div class="option-name">포맷 리사이징</div>
+                            <div class="option-note">가로↔세로 · 300,000원/편</div>
+                        </div>
+                        <div class="quantity-control">
+                            <button type="button" onclick="changeQty('opt-resize', -1)">−</button>
+                            <span class="qty-value" id="qty-opt-resize">0</span>
+                            <span class="qty-unit">편</span>
+                            <button type="button" onclick="changeQty('opt-resize', 1)">+</button>
+                        </div>
+                        <input type="hidden" id="opt-resize" data-price="300000" data-name="포맷 리사이징" data-qty="0">
+                    </div>
+                    <div class="option-item">
+                        <input type="checkbox" id="opt-raw" data-percent="30" data-name="영상 원본(Raw) 제공" onclick="calculateTotal()">
+                        <div class="option-info">
+                            <div class="option-name">영상 원본(Raw) 제공</div>
+                            <div class="option-note">패키지 금액의 30%</div>
+                        </div>
+                        <div class="option-price">+30%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="tip-box warning">
+                <strong>⚠️ Light 패키지 안내</strong><br>
+                Light 패키지는 추가 리터칭 옵션이 <strong>불가</strong>합니다.<br>
+                5컷 이상 필요하시면 Standard 패키지를 선택해 주세요.
+            </div>
+
+            <div class="option-grid">
+                <div class="option-group">
+                    <h4>기타</h4>
+                    <div class="option-item">
+                        <div class="option-info">
+                            <div class="option-name">오버타임</div>
+                            <div class="option-note">400,000원/시간</div>
+                        </div>
+                        <div class="quantity-control">
+                            <button type="button" onclick="changeQty('opt-overtime', -1)">−</button>
+                            <span class="qty-value" id="qty-opt-overtime">0</span>
+                            <span class="qty-unit">시간</span>
+                            <button type="button" onclick="changeQty('opt-overtime', 1)">+</button>
+                        </div>
+                        <input type="hidden" id="opt-overtime" data-price="400000" data-name="오버타임" data-qty="0">
+                    </div>
+                    <div class="option-item">
+                        <input type="checkbox" id="opt-rush" data-percent="10" data-name="급행 납품" onclick="calculateTotal()">
+                        <div class="option-info">
+                            <div class="option-name">급행 납품</div>
+                            <div class="option-note">7영업일 단축 시 · 총 견적의 10%</div>
+                        </div>
+                        <div class="option-price">+10%</div>
+                    </div>
+                    <div class="option-item">
+                        <input type="checkbox" id="opt-trip-seoul" data-price="100000" data-name="출장비 (서울권)" onclick="calculateTotal()">
+                        <div class="option-info">
+                            <div class="option-name">출장비 (서울권)</div>
+                        </div>
+                        <div class="option-price">100,000원</div>
+                    </div>
+                    <div class="option-item">
+                        <input type="checkbox" id="opt-trip-gg" data-price="200000" data-name="출장비 (경기권)" onclick="calculateTotal()">
+                        <div class="option-info">
+                            <div class="option-name">출장비 (경기권)</div>
+                        </div>
+                        <div class="option-price">200,000원</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 페이지 나눔 -->
+        <div class="page-break"></div>
+
+        <!-- 5. 진행 규정 -->
+        <section class="section">
+            <h2 class="section-title">05. 진행 규정</h2>
+
+            <div class="policy-grid">
+                <div class="policy-item">
+                    <h4>💳 결제 조건</h4>
+                    <ul>
+                        <li>예약금 50% 입금 시 일정 확정</li>
+                        <li>잔금 50%는 납품 후 정산</li>
+                        <li>VAT 별도</li>
+                    </ul>
+                </div>
+                <div class="policy-item">
+                    <h4>📅 납품 일정</h4>
+                    <ul>
+                        <li>촬영 원본: 촬영 익일 전달</li>
+                        <li>리터칭/편집본: 약 7영업일</li>
+                        <li>데이터 보관: 납품 후 1개월</li>
+                    </ul>
+                </div>
+                <div class="policy-item">
+                    <h4>🚫 취소 규정</h4>
+                    <ul>
+                        <li>7일 전: 100% 환불</li>
+                        <li>3일 전: 50% 환불</li>
+                        <li>전일/당일: 환불 불가</li>
+                    </ul>
+                </div>
+                <div class="policy-item">
+                    <h4>©️ 저작권</h4>
+                    <p>온라인·인쇄물·사내 용도 영구 사용 가능<br>
+                    <span class="small">TVCF, 옥외광고, 해외 송출 시 별도 협의</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. 별도 협의 -->
+        <section class="section">
+            <h2 class="section-title">06. 별도 협의 항목</h2>
+            <p style="font-size: 12px; color: #666; line-height: 2;">
+                모델 섭외 · 헤어/메이크업 · 의상 스타일리스트 · 대형 세트/특수 장비 · 3D 제작 · 저작권 음악/폰트
+            </p>
+            <div class="tip-box" style="margin-top: 15px;">
+                <strong>ℹ️ 참고</strong><br>
+                · 본 견적은 기획(Creative Directing) 비용이 제외된 실행 견적입니다.<br>
+                · 브랜드 측 레퍼런스와 톤앤매너를 기준으로 현장 연출 및 구현 중심으로 진행됩니다.<br>
+                · 촬영 당일 현장 참관 가능 (인원/시간 제한 없음)
+            </div>
+        </section>
+
+        <!-- 페이지 나눔 -->
+        <div class="page-break"></div>
+
+        <!-- 7. 스튜디오 소개 -->
+        <section class="section" style="margin-top: 30px;">
+            <h2 class="section-title">07. 스튜디오 시설 안내</h2>
+            <p style="font-size: 13px; color: #666; margin-bottom: 20px;">
+                성수동 116평 규모의 상업 전문 스튜디오입니다.
+            </p>
+
+            <div class="studio-gallery">
+                <div class="gallery-item">
+                    <img src="https://kth930084-wq.github.io/pewpew-quote/studio-horizon.jpg" alt="대형 호리존">
+                    <span class="gallery-label">대형 호리존</span>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://kth930084-wq.github.io/pewpew-quote/studio-lounge.jpg" alt="라운지">
+                    <span class="gallery-label">라운지</span>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://kth930084-wq.github.io/pewpew-quote/studio-makeup.jpg" alt="메이크업룸">
+                    <span class="gallery-label">메이크업룸</span>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://kth930084-wq.github.io/pewpew-quote/studio-elevator.jpg" alt="화물 엘리베이터">
+                    <span class="gallery-label">화물 E/V</span>
+                </div>
+            </div>
+
+            <div class="studio-features">
+                <span>✓ 116평 대형 공간</span>
+                <span>✓ 대형 호리존</span>
+                <span>✓ 화물 엘리베이터</span>
+                <span>✓ 주차 가능</span>
+                <span>✓ 메이크업룸</span>
+                <span>✓ 라운지</span>
+            </div>
+        </section>
+
+        <!-- 견적 요청 폼 -->
+        <section class="quote-form-section" id="quote-form">
+            <h3 class="quote-form-title">📋 견적 요청하기</h3>
+
+            <!-- 총 견적 표시 -->
+            <div class="total-estimate">
+                <div class="total-label">예상 견적 (VAT 별도)</div>
+                <div class="total-price"><span id="total-amount">0</span><span class="won">원</span></div>
+                <div class="selected-items" id="selected-items">선택된 항목이 없습니다</div>
+            </div>
+
+            <form id="quoteForm">
+                <!-- 스케줄 확인 버튼 -->
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <a href="https://www.pewpewstudio.com/schedule/" target="_blank" class="schedule-btn">
+                        📅 스케줄 확인하기
+                    </a>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>이름 <span class="required">*</span></label>
+                        <input type="text" name="name" required placeholder="홍길동">
+                    </div>
+                    <div class="form-group">
+                        <label>연락처 <span class="required">*</span></label>
+                        <input type="tel" name="phone" required placeholder="010-1234-5678">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>이메일 <span class="required">*</span></label>
+                        <input type="email" name="email" required placeholder="example@company.com">
+                    </div>
+                    <div class="form-group">
+                        <label>회사/브랜드명</label>
+                        <input type="text" name="company" placeholder="회사 또는 브랜드명">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>희망 촬영일</label>
+                    <input type="date" name="shoot_date" min="">
+                </div>
+
+                <div class="form-group">
+                    <label>추가 요청사항</label>
+                    <textarea name="message" placeholder="촬영할 제품 종류, 특별 요청사항 등을 적어주세요"></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">견적 요청 보내기</button>
+
+                <!-- 예상 견적 안내 문구 -->
+                <div class="estimate-notice">
+                    ⚠️ 본 견적은 <strong>예상 견적</strong>이며, 실제 상담 시 촬영 내용과 요구사항에 따라 달라질 수 있습니다.
+                </div>
+
+                <div class="message success" id="successMsg">
+                    ✅ 견적 요청이 성공적으로 전송되었습니다!<br>
+                    빠른 시일 내에 연락드리겠습니다.
+                </div>
+                <div class="message error" id="errorMsg">
+                    ❌ 전송 중 오류가 발생했습니다.<br>
+                    이메일로 직접 문의해 주세요: taehyoungking@pewpewstudio.com
+                </div>
+            </form>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-logo">PEWPEW STUDIO</div>
+            <div class="footer-contact">
+                서울시 성동구 광나루로 204, 6층<br>
+                <a href="mailto:taehyoungking@pewpewstudio.com">taehyoungking@pewpewstudio.com</a><br>
+                <a href="https://www.instagram.com/pewpew_king/" target="_blank">@pewpew_king</a>
+            </div>
+            <div class="footer-note">
+                본 견적서의 유효기간은 발행일로부터 30일입니다.
+            </div>
+        </footer>
+    </div>
+
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <script>
+        // 오늘 날짜 이후만 선택 가능하도록 설정
+        document.querySelector('input[name="shoot_date"]').min = new Date().toISOString().split('T')[0];
+
+        // 수량 변경 함수
+        function changeQty(optionId, delta) {
+            const input = document.getElementById(optionId);
+            const qtyDisplay = document.getElementById('qty-' + optionId);
+            let currentQty = parseInt(input.dataset.qty) || 0;
+
+            currentQty += delta;
+            if (currentQty < 0) currentQty = 0;
+
+            input.dataset.qty = currentQty;
+            qtyDisplay.textContent = currentQty;
+
+            calculateTotal();
+        }
+
+        // Light 패키지 선택 여부 확인 함수
+        function isLightPackageSelected() {
+            // 사진 패키지에서 Light 선택 여부
+            const photoLightChecked = document.querySelectorAll('#photo-half-light:checked, #photo-one-light:checked');
+            if (photoLightChecked.length > 0) return true;
+
+            // 콤보 패키지에서 Light 선택 여부
+            const comboLightChecked = document.querySelector('#combo-half-light:checked');
+            if (comboLightChecked) return true;
+
+            return false;
+        }
+
+        // 사진 패키지 토글 함수
+        function togglePhotoPackage(card, checkboxId) {
+            const checkbox = document.getElementById(checkboxId);
+            const qtySelector = document.getElementById('qty-' + checkboxId);
+
+            checkbox.checked = !checkbox.checked;
+
+            if (checkbox.checked) {
+                card.classList.add('selected');
+                qtySelector.style.display = 'flex';
+            } else {
+                card.classList.remove('selected');
+                qtySelector.style.display = 'none';
+                // 드롭다운 초기화
+                qtySelector.querySelector('select').value = '1';
+            }
+
+            updateRetouchState();
+            calculateTotal();
+        }
+
+        // 콤보 패키지 토글 함수
+        function toggleComboPackage(card, checkboxId) {
+            const checkbox = document.getElementById(checkboxId);
+            const qtySelector = document.getElementById('qty-' + checkboxId);
+
+            checkbox.checked = !checkbox.checked;
+
+            if (checkbox.checked) {
+                card.classList.add('selected');
+                qtySelector.style.display = 'flex';
+            } else {
+                card.classList.remove('selected');
+                qtySelector.style.display = 'none';
+                // 드롭다운 초기화
+                qtySelector.querySelector('select').value = '1';
+            }
+
+            updateRetouchState();
+            calculateTotal();
+        }
+
+        // 추가 리터칭 비활성화/활성화 함수
+        function updateRetouchState() {
+            const isLight = isLightPackageSelected();
+            const retouchControl = document.querySelector('#opt-retouch').closest('.option-item');
+            const retouchInput = document.getElementById('opt-retouch');
+            const retouchQtyDisplay = document.getElementById('qty-opt-retouch');
+            const buttons = retouchControl.querySelectorAll('.quantity-control button');
+
+            if (isLight) {
+                // Light 패키지 선택 시 비활성화
+                retouchControl.classList.add('disabled');
+                retouchControl.style.opacity = '0.5';
+                retouchControl.style.pointerEvents = 'none';
+                // 수량 리셋
+                retouchInput.dataset.qty = '0';
+                retouchQtyDisplay.textContent = '0';
+                buttons.forEach(btn => btn.disabled = true);
+            } else {
+                // 활성화
+                retouchControl.classList.remove('disabled');
+                retouchControl.style.opacity = '1';
+                retouchControl.style.pointerEvents = 'auto';
+                buttons.forEach(btn => btn.disabled = false);
+            }
+        }
+
+        // 가격 계산 함수
+        function calculateTotal() {
+            let packageTotal = 0; // 패키지 금액 (퍼센트 계산용)
+            let optionTotal = 0;  // 옵션 금액
+            let percentTotal = 0; // 퍼센트 추가 금액
+            const selectedItems = [];
+
+            // 1. 체크박스 패키지 (사진, 영상, 콤보) - 드롭다운 횟수 적용
+            document.querySelectorAll('.package-card input[type="checkbox"]:checked').forEach(checkbox => {
+                const price = parseInt(checkbox.dataset.price) || 0;
+                const name = checkbox.dataset.name || '';
+                const checkboxId = checkbox.id;
+
+                // 드롭다운에서 횟수 가져오기
+                const qtySelector = document.getElementById('qty-' + checkboxId);
+                let qty = 1;
+                if (qtySelector) {
+                    const select = qtySelector.querySelector('select');
+                    if (select) {
+                        qty = parseInt(select.value) || 1;
+                    }
+                }
+
+                packageTotal += price * qty;
+                if (name) {
+                    if (qty > 1) {
+                        selectedItems.push(`${name} × ${qty}회`);
+                    } else {
+                        selectedItems.push(name);
+                    }
+                }
+            });
+
+            // 2. 수량 기반 옵션 (컷당, 초당 등)
+            document.querySelectorAll('input[type="hidden"][data-qty]').forEach(input => {
+                const qty = parseInt(input.dataset.qty) || 0;
+                const price = parseInt(input.dataset.price) || 0;
+                const name = input.dataset.name || '';
+
+                if (qty > 0) {
+                    optionTotal += price * qty;
+                    selectedItems.push(`${name} ${qty}개`);
+                }
+            });
+
+            // 3. 일반 체크박스 옵션 (고정 금액)
+            document.querySelectorAll('.option-item input[type="checkbox"]:checked').forEach(checkbox => {
+                const price = parseInt(checkbox.dataset.price) || 0;
+                const name = checkbox.dataset.name || '';
+
+                // 퍼센트 옵션이 아닌 경우만
+                if (!checkbox.dataset.percent && price > 0) {
+                    optionTotal += price;
+                    if (name) {
+                        selectedItems.push(name);
+                    }
+                }
+            });
+
+            // 4. 퍼센트 옵션 계산 (패키지 금액 기준)
+            // 영상 원본 30%
+            const rawCheckbox = document.getElementById('opt-raw');
+            if (rawCheckbox && rawCheckbox.checked) {
+                const rawPercent = parseInt(rawCheckbox.dataset.percent) || 0;
+                const rawAmount = Math.round(packageTotal * rawPercent / 100);
+                percentTotal += rawAmount;
+                selectedItems.push(`영상 원본 제공 (+${rawAmount.toLocaleString()}원)`);
+            }
+
+            // 5. 급행 납품 10% (총 금액 기준)
+            const rushCheckbox = document.getElementById('opt-rush');
+            let baseTotal = packageTotal + optionTotal + percentTotal;
+
+            if (rushCheckbox && rushCheckbox.checked) {
+                const rushPercent = parseInt(rushCheckbox.dataset.percent) || 0;
+                const rushAmount = Math.round(baseTotal * rushPercent / 100);
+                percentTotal += rushAmount;
+                selectedItems.push(`급행 납품 (+${rushAmount.toLocaleString()}원)`);
+            }
+
+            // 최종 합계
+            const total = packageTotal + optionTotal + percentTotal;
+
+            // 총액 표시 (폼 내부)
+            document.getElementById('total-amount').textContent = total.toLocaleString('ko-KR');
+
+            // 플로팅 가격표 업데이트
+            document.getElementById('floating-total').textContent = total.toLocaleString('ko-KR');
+            document.getElementById('floating-count').textContent =
+                selectedItems.length > 0 ? `${selectedItems.length}개 항목 선택됨` : '선택된 항목 없음';
+
+            // 선택 항목 표시
+            const selectedItemsEl = document.getElementById('selected-items');
+            if (selectedItems.length > 0) {
+                selectedItemsEl.textContent = selectedItems.join(' / ');
+            } else {
+                selectedItemsEl.textContent = '선택된 항목이 없습니다';
+            }
+
+            return { total, selectedItems, packageTotal };
+        }
+
+        // 패키지 카드 클릭 시 체크박스 토글
+        function togglePackage(card, checkboxId) {
+            const checkbox = document.getElementById(checkboxId);
+            checkbox.checked = !checkbox.checked;
+
+            // 선택 상태 스타일 업데이트
+            if (checkbox.checked) {
+                card.classList.add('selected');
+            } else {
+                card.classList.remove('selected');
+            }
+
+            calculateTotal();
+        }
+
+        // 패키지 체크박스 변경 이벤트
+        document.querySelectorAll('.package-card input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const card = this.closest('.package-card');
+                if (card) {
+                    if (this.checked) {
+                        card.classList.add('selected');
+                    } else {
+                        card.classList.remove('selected');
+                    }
+                }
+                calculateTotal();
+            });
+        });
+
+        // 패키지 라디오 버튼 변경 이벤트
+        document.querySelectorAll('.package-card input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const groupName = this.name;
+                // 같은 그룹의 모든 카드에서 selected 제거
+                document.querySelectorAll(`input[name="${groupName}"]`).forEach(r => {
+                    const parentCard = r.closest('.package-card');
+                    if (parentCard) {
+                        parentCard.classList.remove('selected');
+                    }
+                });
+                // 현재 선택된 카드에 selected 추가
+                const card = this.closest('.package-card');
+                if (card) {
+                    card.classList.add('selected');
+                }
+                // Light 패키지 상태 업데이트
+                updateRetouchState();
+                calculateTotal();
+            });
+        });
+
+        // Google Forms 제출 함수
+        function submitToGoogleForm(data) {
+            return new Promise((resolve, reject) => {
+                // Google Form 정보
+                const GOOGLE_FORM_ACTION = 'https://docs.google.com/forms/d/1kWYoM9sEg3aqRsQKG9PYvIcq8KTi2ODxf8iJq2ltnsI/formResponse';
+
+                // Entry IDs
+                const ENTRY_NAME = 'entry.1411825085';     // 이름
+                const ENTRY_PHONE = 'entry.358759333';     // 연락처
+                const ENTRY_EMAIL = 'entry.1155957735';    // 이메일
+
+                // 숨겨진 iframe 생성
+                const iframe = document.createElement('iframe');
+                iframe.name = 'hidden_iframe';
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+
+                // 숨겨진 form 생성
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = GOOGLE_FORM_ACTION;
+                form.target = 'hidden_iframe';
+
+                // 폼 데이터 추가
+                const fields = [
+                    { name: ENTRY_NAME, value: data.name },
+                    { name: ENTRY_PHONE, value: data.phone },
+                    { name: ENTRY_EMAIL, value: data.fullInfo }  // 이메일 필드에 전체 정보 전송
+                ];
+
+                fields.forEach(field => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = field.name;
+                    input.value = field.value;
+                    form.appendChild(input);
+                });
+
+                document.body.appendChild(form);
+
+                // iframe 로드 완료 시 성공으로 간주
+                iframe.onload = function() {
+                    // 폼과 iframe 정리
+                    setTimeout(() => {
+                        document.body.removeChild(form);
+                        document.body.removeChild(iframe);
+                    }, 1000);
+                    resolve();
+                };
+
+                iframe.onerror = function() {
+                    document.body.removeChild(form);
+                    document.body.removeChild(iframe);
+                    reject(new Error('전송 실패'));
+                };
+
+                // 폼 제출
+                form.submit();
+
+                // 타임아웃 (5초 후 성공으로 간주)
+                setTimeout(() => {
+                    resolve();
+                }, 3000);
+            });
+        }
+
+        // 폼 제출 처리
+        document.getElementById('quoteForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const { total, selectedItems, packageTotal } = calculateTotal();
+
+            if (selectedItems.length === 0) {
+                alert('최소 1개 이상의 패키지 또는 옵션을 선택해 주세요.');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '전송 중...';
+
+            // 폼 데이터 수집
+            const formData = new FormData(this);
+            const data = {
+                name: formData.get('name'),
+                phone: formData.get('phone'),
+                email: formData.get('email'),
+                company: formData.get('company') || '미입력',
+                shoot_date: formData.get('shoot_date') || '미정',
+                message: formData.get('message') || '없음',
+                selected_items: selectedItems.join('\n'),
+                total_price: total.toLocaleString('ko-KR') + '원 (VAT 별도)'
+            };
+
+            // 전체 정보를 하나의 문자열로 구성 (이메일 필드에 전송)
+            const fullInfo =
+                `[이메일] ${data.email}\n` +
+                `[회사/브랜드] ${data.company}\n` +
+                `[희망 촬영일] ${data.shoot_date}\n\n` +
+                `=== 선택 항목 ===\n${data.selected_items}\n\n` +
+                `=== 예상 견적 ===\n${data.total_price}\n\n` +
+                `=== 추가 요청사항 ===\n${data.message}`;
+
+            try {
+                await submitToGoogleForm({
+                    name: data.name,
+                    phone: data.phone,
+                    fullInfo: fullInfo
+                });
+
+                // 성공 메시지 표시
+                document.getElementById('successMsg').style.display = 'block';
+                document.getElementById('errorMsg').style.display = 'none';
+                submitBtn.textContent = '전송 완료!';
+
+                // 폼 초기화
+                setTimeout(() => {
+                    this.reset();
+                    document.querySelectorAll('.package-card.selected').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                    document.querySelectorAll('.qty-selector').forEach(sel => {
+                        sel.style.display = 'none';
+                        const select = sel.querySelector('select');
+                        if (select) select.value = '1';
+                    });
+                    document.querySelectorAll('input[type="hidden"][data-qty]').forEach(input => {
+                        input.dataset.qty = '0';
+                        const qtyDisplay = document.getElementById('qty-' + input.id);
+                        if (qtyDisplay) qtyDisplay.textContent = '0';
+                    });
+                    calculateTotal();
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '견적 요청 보내기';
+                }, 3000);
+
+            } catch (error) {
+                console.error('전송 오류:', error);
+                document.getElementById('errorMsg').style.display = 'block';
+                document.getElementById('successMsg').style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.textContent = '견적 요청 보내기';
+            }
+        });
+
+        // 초기 계산
+        calculateTotal();
+    </script>
+</body>
+</html>
