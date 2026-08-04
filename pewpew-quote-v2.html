@@ -895,59 +895,59 @@
         <section class="section">
             <h2 class="section-title">01. 사진 촬영 패키지</h2>
 
-            <!-- Half-day -->
-            <p class="time-label">HALF-DAY (4시간)</p>
-            <div class="package-card recommended" style="max-width: 380px;" onclick="togglePhotoPackage(this, 'photo-half-std')">
-                <div class="checkbox-wrapper">
-                    <input type="checkbox" id="photo-half-std" data-price="2000000" data-name="[사진] Half-day" onclick="event.stopPropagation()">
-                    <label class="checkbox-label">
-                        <div class="package-name">Half-day</div>
-                        <div class="package-subtitle">4시간 촬영</div>
-                    </label>
+            <div class="package-grid">
+                <!-- Half-day -->
+                <div class="package-card" onclick="togglePhotoPackage(this, 'photo-half-std')">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="photo-half-std" data-price="2000000" data-name="[사진] Half-day" onclick="event.stopPropagation()">
+                        <label class="checkbox-label">
+                            <div class="package-name">HALF-DAY</div>
+                            <div class="package-subtitle">4시간 촬영 · 소규모 촬영에 적합</div>
+                        </label>
+                    </div>
+                    <div class="package-price">2,000,000<span class="won">원</span></div>
+                    <ul class="package-features">
+                        <li>촬영 시간 4시간</li>
+                        <li>촬영 원본 전체 제공</li>
+                        <li class="highlight">리터칭 별도 30,000원/컷 (단체컷 50,000원/컷)</li>
+                    </ul>
+                    <div class="qty-selector" id="qty-photo-half-std" style="display: none;">
+                        <label>촬영 횟수:</label>
+                        <select onchange="calculateTotal()">
+                            <option value="1">1회</option>
+                            <option value="2">2회</option>
+                            <option value="3">3회</option>
+                            <option value="4">4회</option>
+                            <option value="5">5회</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="package-price">2,000,000<span class="won">원</span></div>
-                <ul class="package-features">
-                    <li>촬영 시간 4시간</li>
-                    <li>촬영 원본 전체 제공</li>
-                    <li class="highlight">리터칭 별도 30,000원/컷 (단체컷 50,000원/컷)</li>
-                </ul>
-                <div class="qty-selector" id="qty-photo-half-std" style="display: none;">
-                    <label>촬영 횟수:</label>
-                    <select onchange="calculateTotal()">
-                        <option value="1">1회</option>
-                        <option value="2">2회</option>
-                        <option value="3">3회</option>
-                        <option value="4">4회</option>
-                        <option value="5">5회</option>
-                    </select>
-                </div>
-            </div>
 
-            <!-- One-day -->
-            <p class="time-label">ONE-DAY (8시간)</p>
-            <div class="package-card recommended" style="max-width: 380px;" onclick="togglePhotoPackage(this, 'photo-one-std')">
-                <div class="checkbox-wrapper">
-                    <input type="checkbox" id="photo-one-std" data-price="3500000" data-name="[사진] One-day" onclick="event.stopPropagation()">
-                    <label class="checkbox-label">
-                        <div class="package-name">One-day</div>
-                        <div class="package-subtitle">8시간 촬영 · 대량 촬영 · 다양한 연출</div>
-                    </label>
-                </div>
-                <div class="package-price">3,500,000<span class="won">원</span></div>
-                <ul class="package-features">
-                    <li>촬영 시간 8시간</li>
-                    <li>촬영 원본 전체 제공</li>
-                    <li class="highlight">리터칭 별도 30,000원/컷 (단체컷 50,000원/컷)</li>
-                </ul>
-                <div class="qty-selector" id="qty-photo-one-std" style="display: none;">
-                    <label>촬영 횟수:</label>
-                    <select onchange="calculateTotal()">
-                        <option value="1">1회</option>
-                        <option value="2">2회</option>
-                        <option value="3">3회</option>
-                        <option value="4">4회</option>
-                        <option value="5">5회</option>
-                    </select>
+                <!-- One-day -->
+                <div class="package-card" onclick="togglePhotoPackage(this, 'photo-one-std')">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="photo-one-std" data-price="3500000" data-name="[사진] One-day" onclick="event.stopPropagation()">
+                        <label class="checkbox-label">
+                            <div class="package-name">ONE-DAY</div>
+                            <div class="package-subtitle">8시간 촬영 · 대량 촬영 · 다양한 연출</div>
+                        </label>
+                    </div>
+                    <div class="package-price">3,500,000<span class="won">원</span></div>
+                    <ul class="package-features">
+                        <li>촬영 시간 8시간</li>
+                        <li>촬영 원본 전체 제공</li>
+                        <li class="highlight">리터칭 별도 30,000원/컷 (단체컷 50,000원/컷)</li>
+                    </ul>
+                    <div class="qty-selector" id="qty-photo-one-std" style="display: none;">
+                        <label>촬영 횟수:</label>
+                        <select onchange="calculateTotal()">
+                            <option value="1">1회</option>
+                            <option value="2">2회</option>
+                            <option value="3">3회</option>
+                            <option value="4">4회</option>
+                            <option value="5">5회</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
