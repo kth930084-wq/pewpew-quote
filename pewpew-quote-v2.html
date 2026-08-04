@@ -898,6 +898,13 @@
             background: #1a1a1a;
             color: #fff;
         }
+        .fx-note {
+            font-size: 11px;
+            line-height: 1.6;
+            margin-top: 8px;
+        }
+        .floating-price .fx-note { color: #9a9a9a; }
+        .total-estimate .fx-note { color: #888; }
         html[lang="ja"] body { font-family: 'Noto Sans JP', 'Noto Sans KR', sans-serif; }
         html[lang="zh-CN"] body { font-family: 'Noto Sans SC', 'Noto Sans KR', sans-serif; }
         @media (max-width: 768px) {
@@ -912,6 +919,7 @@
         <div class="label">예상 견적 (VAT 별도)</div>
         <div class="price"><span id="floating-total">0</span><span class="won">원</span></div>
         <div class="item-count" id="floating-count">선택된 항목 없음</div>
+        <div class="fx-note" id="fx-floating" style="display:none;"></div>
         <a href="#quote-form" class="go-form-btn">견적 요청하기 →</a>
     </div>
 
@@ -1401,6 +1409,7 @@
                 <div class="total-label">예상 견적 (VAT 별도)</div>
                 <div class="total-price"><span id="total-amount">0</span><span class="won">원</span></div>
                 <div class="selected-items" id="selected-items">선택된 항목이 없습니다</div>
+                <div class="fx-note" id="fx-form" style="display:none;"></div>
             </div>
 
             <form id="quoteForm">
@@ -2193,8 +2202,52 @@
             en: 'Tell us about your products and any special requests',
             ja: '撮影する製品の種類やご要望などをご記入ください',
             zh: '请填写拍摄产品类型及特殊需求等'
+        },
+        krw_notice: {
+            en: 'All prices are in Korean Won (KRW).',
+            ja: '価格はすべて韓国ウォン（KRW）建てです。',
+            zh: '所有价格均以韩元（KRW）计价。'
+        },
+        approx: {
+            en: n => `≈ $${n} USD · reference only`,
+            ja: n => `約 ${n}円（参考値）`,
+            zh: n => `约 ${n}元（仅供参考）`
         }
     };
+
+    // ── 참고 환율 (KRW → USD/JPY/CNY) ──
+    const PP_FX = { cur: { en: 'USD', ja: 'JPY', zh: 'CNY' }, rates: null };
+    let PP_LAST_TOTAL = 0;
+    function ppUpdateFx(total) {
+        if (typeof total === 'number') PP_LAST_TOTAL = total;
+        const els = [document.getElementById('fx-floating'), document.getElementById('fx-form')];
+        if (PP_LANG === 'ko') { els.forEach(e => { if (e) e.style.display = 'none'; }); return; }
+        const notice = PP_T.krw_notice[PP_LANG];
+        let line = notice;
+        const cur = PP_FX.cur[PP_LANG];
+        if (PP_FX.rates && PP_FX.rates[cur] && PP_LAST_TOTAL > 0) {
+            let v = PP_LAST_TOTAL * PP_FX.rates[cur];
+            v = cur === 'JPY' ? Math.round(v / 100) * 100 : Math.round(v);
+            line = PP_T.approx[PP_LANG](v.toLocaleString()) + '<br>' + notice;
+        }
+        els.forEach(e => { if (e) { e.innerHTML = line; e.style.display = 'block'; } });
+    }
+    (function fetchFx() {
+        fetch('https://api.frankfurter.app/latest?from=KRW&to=USD,JPY,CNY')
+            .then(r => r.ok ? r.json() : Promise.reject())
+            .then(d => { if (d && d.rates) { PP_FX.rates = d.rates; ppUpdateFx(); } })
+            .catch(() => {
+                fetch('https://open.er-api.com/v6/latest/KRW')
+                    .then(r => r.ok ? r.json() : Promise.reject())
+                    .then(d => {
+                        if (d && d.rates) {
+                            PP_FX.rates = { USD: d.rates.USD, JPY: d.rates.JPY, CNY: d.rates.CNY };
+                            ppUpdateFx();
+                        }
+                    })
+                    .catch(() => {});
+            });
+    })();
 
     let PP_LANG = localStorage.getItem('pp_lang') || 'ko';
 
@@ -2267,7 +2320,9 @@
         if (rawCheckbox && rawCheckbox.checked) {
             const rawAmount = Math.round(packageTotal * (parseInt(rawCheckbox.dataset.percent) || 0) / 100);
             percentTotal += rawAmount;
-            selectedItems.push(`${PP_T.raw_plus[PP_LANG]} (+${rawAmount.toLocaleString()}${PP_T.won[PP_LANG].trim()})`);
+            selectedItems.push(PP_LANG === 'ko'
+                ? `${PP_T.raw_plus.ko} (+${rawAmount.toLocaleString()}원)`
+                : `${PP_T.raw_plus[PP_LANG]} (+₩${rawAmount.toLocaleString()})`);
         }
 
         const rushCheckbox = document.getElementById('opt-rush');
@@ -2275,12 +2330,21 @@
             const baseTotal = packageTotal + optionTotal + percentTotal;
             const rushAmount = Math.round(baseTotal * (parseInt(rushCheckbox.dataset.percent) || 0) / 100);
             percentTotal += rushAmount;
-            selectedItems.push(`${PP_T.rush_plus[PP_LANG]} (+${rushAmount.toLocaleString()}${PP_T.won[PP_LANG].trim()})`);
+            selectedItems.push(PP_LANG === 'ko'
+                ? `${PP_T.rush_plus.ko} (+${rushAmount.toLocaleString()}원)`
+                : `${PP_T.rush_plus[PP_LANG]} (+₩${rushAmount.toLocaleString()})`);
         }
 
         const total = packageTotal + optionTotal + percentTotal;
-        document.getElementById('total-amount').textContent = total.toLocaleString('ko-KR');
-        document.getElementById('floating-total').textContent = total.toLocaleString('ko-KR');
+        const numTxt = (PP_LANG === 'ko' ? '' : '₩') + total.toLocaleString('ko-KR');
+        document.getElementById('total-amount').textContent = numTxt;
+        document.getElementById('floating-total').textContent = numTxt;
+        const wonTxt = PP_LANG === 'ko' ? '원' : '';
+        const fw = document.querySelector('.floating-price .price .won');
+        if (fw) fw.textContent = wonTxt;
+        const tw = document.querySelector('.total-price .won');
+        if (tw) tw.textContent = wonTxt;
+        ppUpdateFx(total);
         document.getElementById('floating-count').textContent =
             selectedItems.length > 0 ? PP_T.count_selected[PP_LANG](selectedItems.length) : PP_T.none_floating[PP_LANG];
 
@@ -2300,7 +2364,12 @@
             const entry = PP_I18N[el.dataset.i18n];
             if (entry) el.innerHTML = entry[lang] || entry.ko;
         });
-        document.querySelectorAll('.won').forEach(el => { el.textContent = PP_T.won[lang]; });
+        document.querySelectorAll('.package-price').forEach(el => {
+            if (!el.dataset.amount) el.dataset.amount = el.textContent.replace(/[^0-9,]/g, '');
+            el.innerHTML = lang === 'ko'
+                ? `${el.dataset.amount}<span class="won">원</span>`
+                : `₩${el.dataset.amount}<span class="won"></span>`;
+        });
         document.querySelectorAll('.qty-selector select option').forEach(o => {
             o.textContent = PP_T.times_opt[lang](parseInt(o.value));
         });
