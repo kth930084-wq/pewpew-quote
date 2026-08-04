@@ -870,30 +870,29 @@
 
         /* 언어 선택 */
         .lang-switcher {
-            position: fixed;
-            top: 14px;
-            right: 20px;
-            z-index: 1001;
-            display: flex;
-            gap: 4px;
-            background: rgba(255,255,255,0.94);
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            padding: 4px 6px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            backdrop-filter: blur(6px);
+            display: inline-flex;
+            gap: 6px;
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            border-radius: 26px;
+            padding: 6px 8px;
+            margin-bottom: 45px;
         }
         .lang-switcher button {
             border: none;
             background: transparent;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 14px;
+            padding: 8px 20px;
+            border-radius: 20px;
             cursor: pointer;
             color: #555;
             font-family: inherit;
             white-space: nowrap;
+            transition: all 0.15s;
+        }
+        .lang-switcher button:hover {
+            color: #1a1a1a;
         }
         .lang-switcher button.active {
             background: #1a1a1a;
@@ -902,20 +901,12 @@
         html[lang="ja"] body { font-family: 'Noto Sans JP', 'Noto Sans KR', sans-serif; }
         html[lang="zh-CN"] body { font-family: 'Noto Sans SC', 'Noto Sans KR', sans-serif; }
         @media (max-width: 768px) {
-            .lang-switcher { top: 10px; right: 10px; padding: 3px 5px; }
-            .lang-switcher button { font-size: 11px; padding: 3px 8px; }
+            .lang-switcher { gap: 3px; padding: 5px 6px; margin-bottom: 35px; }
+            .lang-switcher button { font-size: 12px; padding: 6px 12px; }
         }
     </style>
 </head>
 <body>
-    <!-- 언어 선택 -->
-    <div class="lang-switcher" id="langSwitcher">
-        <button type="button" data-lang="ko" class="active">한국어</button>
-        <button type="button" data-lang="en">English</button>
-        <button type="button" data-lang="ja">日本語</button>
-        <button type="button" data-lang="zh">中文</button>
-    </div>
-
     <!-- 플로팅 가격표 -->
     <div class="floating-price" id="floatingPrice">
         <div class="label">예상 견적 (VAT 별도)</div>
@@ -927,6 +918,12 @@
     <div class="page">
         <!-- 표지 페이지 -->
         <header class="header cover-page">
+            <div class="lang-switcher" id="langSwitcher">
+                <button type="button" data-lang="ko" class="active">한국어</button>
+                <button type="button" data-lang="en">English</button>
+                <button type="button" data-lang="ja">日本語</button>
+                <button type="button" data-lang="zh">中文</button>
+            </div>
             <div class="logo">PEWPEW STUDIO</div>
             <div class="tagline">Commercial Photography & Videography</div>
             <div class="studio-info">
@@ -1861,7 +1858,7 @@
             ko: '성수동 116평 · 대형 호리존 · 주차 가능 · 화물 E/V',
             en: 'Seongsu-dong, Seoul · 383㎡ · Large Cyclorama · Parking · Freight Elevator',
             ja: 'ソウル聖水洞 · 383㎡ · 大型ホリゾント · 駐車可 · 貨物エレベーター',
-            zh: '首尔圣水洞 · 383㎡ · 大型天幕影棚 · 可停车 · 货运电梯'
+            zh: '首尔圣水洞 · 383㎡ · 大型无影墙影棚 · 可停车 · 货运电梯'
         },
         doc_title: {
             ko: '서비스 안내 및 견적서',
@@ -1907,12 +1904,12 @@
         },
         feat_4h: { ko: '촬영 시간 4시간', en: '4 hours of shooting', ja: '撮影時間4時間', zh: '拍摄时间4小时' },
         feat_8h: { ko: '촬영 시간 8시간', en: '8 hours of shooting', ja: '撮影時間8時間', zh: '拍摄时间8小时' },
-        feat_raw_all: { ko: '촬영 원본 전체 제공', en: 'All original files provided', ja: '撮影原本を全数納品', zh: '提供全部拍摄原片' },
+        feat_raw_all: { ko: '촬영 원본 전체 제공', en: 'All original files provided', ja: '撮影データ全カット納品', zh: '提供全部拍摄原片' },
         feat_retouch_sep: {
             ko: '리터칭 별도 30,000원/컷 (단체컷 50,000원/컷)',
-            en: 'Retouching billed separately: ₩30,000/cut (group cuts ₩50,000/cut)',
+            en: 'Retouching billed separately: ₩30,000/cut (group shots ₩50,000/cut)',
             ja: 'レタッチ別途 30,000ウォン/カット（集合カットは50,000ウォン/カット）',
-            zh: '修图另计 30,000韩元/张（团体照 50,000韩元/张）'
+            zh: '修图另计 30,000韩元/张（组合照 50,000韩元/张）'
         },
         qty_label: { ko: '촬영 횟수:', en: 'Number of shoots:', ja: '撮影回数:', zh: '拍摄次数:' },
         vid_half_sub: { ko: 'Half-day · 4시간', en: 'Half-day · 4 hours', ja: 'Half-day · 4時間', zh: 'Half-day · 4小时' },
@@ -1999,7 +1996,7 @@
             ja: '30,000ウォン/カット · 修正2回込み',
             zh: '30,000韩元/张 · 含2次修改'
         },
-        opt_retouch_group_name: { ko: '단체컷 리터칭', en: 'Group-Cut Retouching', ja: '集合カットレタッチ', zh: '团体照修图' },
+        opt_retouch_group_name: { ko: '단체컷 리터칭', en: 'Group-Shot Retouching', ja: '集合カットレタッチ', zh: '组合照修图' },
         opt_retouch_group_note: {
             ko: '50,000원/컷 · 2회 수정 포함',
             en: '₩50,000/cut · incl. 2 revisions',
@@ -2076,12 +2073,12 @@
             ja: 'ソウル・聖水洞にある383㎡の商業撮影専門スタジオです。',
             zh: '位于首尔圣水洞的383㎡专业商业摄影棚。'
         },
-        gal_horizon: { ko: '대형 호리존', en: 'Large cyclorama', ja: '大型ホリゾント', zh: '大型天幕' },
+        gal_horizon: { ko: '대형 호리존', en: 'Large cyclorama', ja: '大型ホリゾント', zh: '大型无影墙' },
         gal_lounge: { ko: '라운지', en: 'Lounge', ja: 'ラウンジ', zh: '休息区' },
         gal_makeup: { ko: '메이크업룸', en: 'Makeup room', ja: 'メイクルーム', zh: '化妆间' },
         gal_ev: { ko: '화물 E/V', en: 'Freight elevator', ja: '貨物エレベーター', zh: '货运电梯' },
         sf_1: { ko: '✓ 116평 대형 공간', en: '✓ 383㎡ spacious studio', ja: '✓ 383㎡の大空間', zh: '✓ 383㎡宽敞空间' },
-        sf_2: { ko: '✓ 대형 호리존', en: '✓ Large cyclorama', ja: '✓ 大型ホリゾント', zh: '✓ 大型天幕' },
+        sf_2: { ko: '✓ 대형 호리존', en: '✓ Large cyclorama', ja: '✓ 大型ホリゾント', zh: '✓ 大型无影墙' },
         sf_3: { ko: '✓ 화물 엘리베이터', en: '✓ Freight elevator', ja: '✓ 貨物エレベーター', zh: '✓ 货运电梯' },
         sf_4: { ko: '✓ 주차 가능', en: '✓ Parking available', ja: '✓ 駐車可能', zh: '✓ 可停车' },
         sf_5: { ko: '✓ 메이크업룸', en: '✓ Makeup room', ja: '✓ メイクルーム', zh: '✓ 化妆间' },
@@ -2150,7 +2147,7 @@
         '[사진+영상] Half-day Standard All-in-One': { en: '[Photo+Video] Half-day Standard All-in-One', ja: '[写真+動画] Half-day Standard All-in-One', zh: '[照片+视频] Half-day Standard All-in-One' },
         '[사진+영상] One-day Standard All-in-One': { en: '[Photo+Video] One-day Standard All-in-One', ja: '[写真+動画] One-day Standard All-in-One', zh: '[照片+视频] One-day Standard All-in-One' },
         '리터칭': { en: 'Retouching', ja: 'レタッチ', zh: '修图' },
-        '단체컷 리터칭': { en: 'Group-cut retouching', ja: '集合カットレタッチ', zh: '团体照修图' },
+        '단체컷 리터칭': { en: 'Group-shot retouching', ja: '集合カットレタッチ', zh: '组合照修图' },
         '누끼컷': { en: 'Cut-out', ja: '切り抜き', zh: '抠图' },
         '특수재질 누끼컷': { en: 'Special-material cut-out', ja: '特殊素材切り抜き', zh: '特殊材质抠图' },
         '분량 초과 편집': { en: 'Extended-length editing', ja: '尺超過編集', zh: '超时长剪辑' },
