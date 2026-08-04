@@ -6,6 +6,8 @@
     <title>PEWPEW STUDIO 견적표</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
 
         * {
             margin: 0;
@@ -865,9 +867,55 @@
                 min-width: auto;
             }
         }
+
+        /* 언어 선택 */
+        .lang-switcher {
+            position: fixed;
+            top: 14px;
+            right: 20px;
+            z-index: 1001;
+            display: flex;
+            gap: 4px;
+            background: rgba(255,255,255,0.94);
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 4px 6px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            backdrop-filter: blur(6px);
+        }
+        .lang-switcher button {
+            border: none;
+            background: transparent;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 14px;
+            cursor: pointer;
+            color: #555;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        .lang-switcher button.active {
+            background: #1a1a1a;
+            color: #fff;
+        }
+        html[lang="ja"] body { font-family: 'Noto Sans JP', 'Noto Sans KR', sans-serif; }
+        html[lang="zh-CN"] body { font-family: 'Noto Sans SC', 'Noto Sans KR', sans-serif; }
+        @media (max-width: 768px) {
+            .lang-switcher { top: 10px; right: 10px; padding: 3px 5px; }
+            .lang-switcher button { font-size: 11px; padding: 3px 8px; }
+        }
     </style>
 </head>
 <body>
+    <!-- 언어 선택 -->
+    <div class="lang-switcher" id="langSwitcher">
+        <button type="button" data-lang="ko" class="active">한국어</button>
+        <button type="button" data-lang="en">English</button>
+        <button type="button" data-lang="ja">日本語</button>
+        <button type="button" data-lang="zh">中文</button>
+    </div>
+
     <!-- 플로팅 가격표 -->
     <div class="floating-price" id="floatingPrice">
         <div class="label">예상 견적 (VAT 별도)</div>
@@ -1717,13 +1765,13 @@
             const { total, selectedItems, packageTotal } = calculateTotal();
 
             if (selectedItems.length === 0) {
-                alert('최소 1개 이상의 패키지 또는 옵션을 선택해 주세요.');
+                alert(PP_T.alert_min[PP_LANG]);
                 return;
             }
 
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.textContent = '전송 중...';
+            submitBtn.textContent = PP_T.sending[PP_LANG];
 
             // 폼 데이터 수집
             const formData = new FormData(this);
@@ -1740,6 +1788,7 @@
 
             // 전체 정보를 하나의 문자열로 구성 (이메일 필드에 전송)
             const fullInfo =
+                `[언어] ${PP_LANG}\n` +
                 `[이메일] ${data.email}\n` +
                 `[회사/브랜드] ${data.company}\n` +
                 `[희망 촬영일] ${data.shoot_date}\n\n` +
@@ -1757,7 +1806,7 @@
                 // 성공 메시지 표시
                 document.getElementById('successMsg').style.display = 'block';
                 document.getElementById('errorMsg').style.display = 'none';
-                submitBtn.textContent = '전송 완료!';
+                submitBtn.textContent = PP_T.sent[PP_LANG];
 
                 // 폼 초기화
                 setTimeout(() => {
@@ -1777,7 +1826,7 @@
                     });
                     calculateTotal();
                     submitBtn.disabled = false;
-                    submitBtn.textContent = '견적 요청 보내기';
+                    submitBtn.textContent = PP_T.submit_btn[PP_LANG];
                 }, 3000);
 
             } catch (error) {
@@ -1785,12 +1834,499 @@
                 document.getElementById('errorMsg').style.display = 'block';
                 document.getElementById('successMsg').style.display = 'none';
                 submitBtn.disabled = false;
-                submitBtn.textContent = '견적 요청 보내기';
+                submitBtn.textContent = PP_T.submit_btn[PP_LANG];
             }
         });
 
         // 초기 계산
         calculateTotal();
+    </script>
+
+    <script>
+    // ===================== 다국어 (ko / en / ja / zh) =====================
+    const PP_I18N = {
+        fp_label: {
+            ko: '예상 견적 (VAT 별도)',
+            en: 'Estimated Quote (VAT excl.)',
+            ja: '概算お見積り（VAT別）',
+            zh: '预估报价（增值税另计）'
+        },
+        fp_btn: {
+            ko: '견적 요청하기 →',
+            en: 'Request a Quote →',
+            ja: '見積を依頼する →',
+            zh: '申请报价 →'
+        },
+        studio_info: {
+            ko: '성수동 116평 · 대형 호리존 · 주차 가능 · 화물 E/V',
+            en: 'Seongsu-dong, Seoul · 383㎡ · Large Cyclorama · Parking · Freight Elevator',
+            ja: 'ソウル聖水洞 · 383㎡ · 大型ホリゾント · 駐車可 · 貨物エレベーター',
+            zh: '首尔圣水洞 · 383㎡ · 大型天幕影棚 · 可停车 · 货运电梯'
+        },
+        doc_title: {
+            ko: '서비스 안내 및 견적서',
+            en: 'Service Guide & Quotation',
+            ja: 'サービス案内・お見積書',
+            zh: '服务介绍与报价单'
+        },
+        s1: { ko: '01. 사진 촬영 패키지', en: '01. Photography Packages', ja: '01. 写真撮影パッケージ', zh: '01. 照片拍摄套餐' },
+        s2: {
+            ko: '02. 영상 촬영 패키지 <span class="section-subtitle">Standard Only</span>',
+            en: '02. Video Production Packages <span class="section-subtitle">Standard Only</span>',
+            ja: '02. 動画撮影パッケージ <span class="section-subtitle">Standard Only</span>',
+            zh: '02. 视频拍摄套餐 <span class="section-subtitle">Standard Only</span>'
+        },
+        s3: {
+            ko: '03. 사진 + 영상 패키지 <span class="section-subtitle">동시 촬영 할인</span>',
+            en: '03. Photo + Video Packages <span class="section-subtitle">Combined-shoot discount</span>',
+            ja: '03. 写真＋動画パッケージ <span class="section-subtitle">同時撮影割引</span>',
+            zh: '03. 照片＋视频套餐 <span class="section-subtitle">同期拍摄优惠</span>'
+        },
+        s4: {
+            ko: '04. 추가 옵션 <span class="section-subtitle">필요한 옵션과 수량을 선택하세요</span>',
+            en: '04. Add-on Options <span class="section-subtitle">Select options and quantities</span>',
+            ja: '04. 追加オプション <span class="section-subtitle">必要なオプションと数量をお選びください</span>',
+            zh: '04. 附加选项 <span class="section-subtitle">请选择所需选项及数量</span>'
+        },
+        s5: { ko: '05. 진행 규정', en: '05. Terms & Policies', ja: '05. 進行規定', zh: '05. 流程规定' },
+        s6: { ko: '06. 별도 협의 항목', en: '06. Items for Separate Discussion', ja: '06. 別途協議項目', zh: '06. 另行协商项目' },
+        s7: { ko: '07. 스튜디오 시설 안내', en: '07. Studio Facilities', ja: '07. スタジオ施設のご案内', zh: '07. 影棚设施介绍' },
+        tl_half: { ko: 'HALF-DAY (4시간)', en: 'HALF-DAY (4 hours)', ja: 'HALF-DAY（4時間）', zh: 'HALF-DAY（4小时）' },
+        tl_one: { ko: 'ONE-DAY (8시간)', en: 'ONE-DAY (8 hours)', ja: 'ONE-DAY（8時間）', zh: 'ONE-DAY（8小时）' },
+        half_sub: {
+            ko: '4시간 촬영 · 소규모 촬영에 적합',
+            en: '4-hour shoot · Ideal for smaller projects',
+            ja: '4時間撮影 · 小規模撮影に最適',
+            zh: '4小时拍摄 · 适合小型拍摄'
+        },
+        one_sub: {
+            ko: '8시간 촬영 · 대량 촬영 · 다양한 연출',
+            en: '8-hour shoot · High volume · Varied setups',
+            ja: '8時間撮影 · 大量撮影 · 多彩な演出',
+            zh: '8小时拍摄 · 大批量拍摄 · 多种布景'
+        },
+        feat_4h: { ko: '촬영 시간 4시간', en: '4 hours of shooting', ja: '撮影時間4時間', zh: '拍摄时间4小时' },
+        feat_8h: { ko: '촬영 시간 8시간', en: '8 hours of shooting', ja: '撮影時間8時間', zh: '拍摄时间8小时' },
+        feat_raw_all: { ko: '촬영 원본 전체 제공', en: 'All original files provided', ja: '撮影原本を全数納品', zh: '提供全部拍摄原片' },
+        feat_retouch_sep: {
+            ko: '리터칭 별도 30,000원/컷 (단체컷 50,000원/컷)',
+            en: 'Retouching billed separately: ₩30,000/cut (group cuts ₩50,000/cut)',
+            ja: 'レタッチ別途 30,000ウォン/カット（集合カットは50,000ウォン/カット）',
+            zh: '修图另计 30,000韩元/张（团体照 50,000韩元/张）'
+        },
+        qty_label: { ko: '촬영 횟수:', en: 'Number of shoots:', ja: '撮影回数:', zh: '拍摄次数:' },
+        vid_half_sub: { ko: 'Half-day · 4시간', en: 'Half-day · 4 hours', ja: 'Half-day · 4時間', zh: 'Half-day · 4小时' },
+        vid_one_sub: { ko: 'One-day · 8시간', en: 'One-day · 8 hours', ja: 'One-day · 8時間', zh: 'One-day · 8小时' },
+        vid_half_unit: {
+            ko: '15초 1편 or 5초 3종',
+            en: 'One 15-sec video or three 5-sec videos',
+            ja: '15秒×1本 または 5秒×3種',
+            zh: '15秒1条 或 5秒3条'
+        },
+        vid_one_unit: {
+            ko: '30초 1편 or 15초 2편',
+            en: 'One 30-sec video or two 15-sec videos',
+            ja: '30秒×1本 または 15秒×2本',
+            zh: '30秒1条 或 15秒2条'
+        },
+        feat_edit: { ko: '컷편집 + 컬러 그레이딩', en: 'Editing + color grading', ja: 'カット編集＋カラーグレーディング', zh: '剪辑＋调色' },
+        feat_subs: { ko: '자막 + 로고 삽입', en: 'Subtitles + logo insertion', ja: 'テロップ＋ロゴ挿入', zh: '字幕＋Logo植入' },
+        feat_2rev: { ko: '2회 수정 포함', en: 'Includes 2 rounds of revisions', ja: '修正2回込み', zh: '含2次修改' },
+        combo_light_sub: {
+            ko: '사진 촬영 + 세로형 영상 1편',
+            en: 'Photo shoot + one vertical video',
+            ja: '写真撮影＋縦型動画1本',
+            zh: '照片拍摄＋竖版视频1条'
+        },
+        combo_half_std_sub: { ko: '사진 + 영상 Half-day', en: 'Photo + Video Half-day', ja: '写真＋動画 Half-day', zh: '照片＋视频 Half-day' },
+        combo_one_std_sub: {
+            ko: '사진 + 영상 One-day · 하이엔드 풀패키지',
+            en: 'Photo + Video One-day · High-end full package',
+            ja: '写真＋動画 One-day · ハイエンドフルパッケージ',
+            zh: '照片＋视频 One-day · 高端全套'
+        },
+        combo_light_unit: { ko: '입문용 패키지', en: 'Entry package', ja: '入門パッケージ', zh: '入门套餐' },
+        combo_half_unit: { ko: '50만원 할인 적용', en: '₩500,000 discount applied', ja: '50万ウォン割引適用', zh: '已优惠50万韩元' },
+        combo_one_unit: {
+            ko: '정가 7,000,000원 → 1,000,000원 할인',
+            en: 'Regular ₩7,000,000 → ₩1,000,000 off',
+            ja: '定価7,000,000ウォン → 1,000,000ウォン割引',
+            zh: '原价7,000,000韩元 → 优惠1,000,000韩元'
+        },
+        combo_light_feat_video: {
+            ko: '영상 세로형 15초 1편 (수정 불가)',
+            en: 'One vertical 15-sec video (no revisions)',
+            ja: '縦型15秒動画1本（修正不可）',
+            zh: '竖版15秒视频1条（不支持修改）'
+        },
+        combo_half_feat_video: {
+            ko: '영상 15초 3종 or 15초 1편',
+            en: 'Three 15-sec videos or one 15-sec video',
+            ja: '15秒動画3種 または 1本',
+            zh: '15秒视频3条 或 1条'
+        },
+        combo_one_feat_video: {
+            ko: '영상 30초 1편 or 15초 2편',
+            en: 'One 30-sec video or two 15-sec videos',
+            ja: '30秒動画1本 または 15秒2本',
+            zh: '30秒视频1条 或 15秒2条'
+        },
+        tip_photo: {
+            ko: '<strong>📸 촬영 가이드</strong><br> · 일반 제품 (단순 배경): 4시간 기준 약 10~15컷 촬영 가능<br> · 고난이도 제품 (유광/메탈/투명): 4시간 기준 약 4~6컷 촬영 가능<br> · 촬영 컷 수 제한 없음, 리터칭 컷은 브랜드 측 셀렉 기준',
+            en: '<strong>📸 Shooting Guide</strong><br>· Standard products (simple background): approx. 10–15 cuts per 4 hours<br>· Complex products (glossy/metallic/transparent): approx. 4–6 cuts per 4 hours<br>· No limit on shots taken; retouched cuts are selected by the brand',
+            ja: '<strong>📸 撮影ガイド</strong><br>· 一般製品（シンプル背景）：4時間で約10〜15カット<br>· 高難度製品（光沢・メタル・透明）：4時間で約4〜6カット<br>· 撮影カット数は無制限、レタッチカットはブランド様のセレクト基準',
+            zh: '<strong>📸 拍摄指南</strong><br>· 常规产品（简单背景）：4小时约可拍摄10~15张<br>· 高难度产品（亮面/金属/透明）：4小时约可拍摄4~6张<br>· 拍摄张数不限，修图张数以品牌方选片为准'
+        },
+        tip_video_inc: {
+            ko: '<strong>🎬 포함 내역</strong><br> 기본 컷편집, 컬러 그레이딩, 라이선스 BGM, 자막(기본), 로고 삽입<br> <span class="small">※ 모션그래픽, 3D 효과, 성우 녹음, 유료 폰트는 별도 협의</span>',
+            en: '<strong>🎬 What\'s Included</strong><br>Editing, color grading, licensed BGM, basic subtitles, logo insertion<br><span class="small">※ Motion graphics, 3D effects, voice-over, and paid fonts are quoted separately</span>',
+            ja: '<strong>🎬 含まれる内容</strong><br>カット編集、カラーグレーディング、ライセンスBGM、テロップ（基本）、ロゴ挿入<br><span class="small">※ モーショングラフィックス、3Dエフェクト、ナレーション収録、有料フォントは別途協議</span>',
+            zh: '<strong>🎬 包含内容</strong><br>基础剪辑、调色、正版BGM、基础字幕、Logo植入<br><span class="small">※ 动态图形、3D特效、配音录制、付费字体需另行协商</span>'
+        },
+        tip_combo: {
+            ko: '<strong>💡 왜 All-in-One이 유리한가요?</strong><br> 사진과 영상을 동시에 촬영하면 세팅·조명·연출을 공유할 수 있어 현장 효율이 높아집니다.<br> 별도 촬영 대비 시간과 비용 모두 절약됩니다.',
+            en: '<strong>💡 Why All-in-One?</strong><br>Shooting photo and video together shares sets, lighting, and styling, making the day far more efficient.<br>It saves both time and cost compared with separate shoots.',
+            ja: '<strong>💡 All-in-Oneがお得な理由</strong><br>写真と動画を同時に撮影すると、セット・照明・演出を共有でき、現場の効率が高まります。<br>別々に撮影するより時間もコストも節約できます。',
+            zh: '<strong>💡 为什么选择All-in-One？</strong><br>照片与视频同期拍摄可共用布景、灯光与造型，现场效率更高。<br>相比分开拍摄，时间和费用都更节省。'
+        },
+        opt_g1: { ko: '이미지 후반 작업', en: 'Image Post-Production', ja: '画像レタッチ・後加工', zh: '图片后期' },
+        opt_g2: { ko: '영상 추가 작업', en: 'Video Add-ons', ja: '動画追加作業', zh: '视频附加项目' },
+        opt_g3: { ko: '기타', en: 'Others', ja: 'その他', zh: '其他' },
+        opt_retouch_name: { ko: '리터칭', en: 'Retouching', ja: 'レタッチ', zh: '修图' },
+        opt_retouch_note: {
+            ko: '30,000원/컷 · 2회 수정 포함',
+            en: '₩30,000/cut · incl. 2 revisions',
+            ja: '30,000ウォン/カット · 修正2回込み',
+            zh: '30,000韩元/张 · 含2次修改'
+        },
+        opt_retouch_group_name: { ko: '단체컷 리터칭', en: 'Group-Cut Retouching', ja: '集合カットレタッチ', zh: '团体照修图' },
+        opt_retouch_group_note: {
+            ko: '50,000원/컷 · 2회 수정 포함',
+            en: '₩50,000/cut · incl. 2 revisions',
+            ja: '50,000ウォン/カット · 修正2回込み',
+            zh: '50,000韩元/张 · 含2次修改'
+        },
+        opt_nukki_name: { ko: '누끼컷 (배경 제거)', en: 'Cut-out (Background Removal)', ja: '切り抜き（背景除去）', zh: '抠图（去背景）' },
+        opt_nukki_note: { ko: '50,000원/컷', en: '₩50,000/cut', ja: '50,000ウォン/カット', zh: '50,000韩元/张' },
+        opt_special_name: { ko: '특수재질 누끼컷', en: 'Special-Material Cut-out', ja: '特殊素材の切り抜き', zh: '特殊材质抠图' },
+        opt_special_note: { ko: '유광/메탈/투명 재질', en: 'Glossy / metallic / transparent', ja: '光沢・メタル・透明素材', zh: '亮面/金属/透明材质' },
+        price_80k: { ko: '80,000원', en: '₩80,000', ja: '80,000ウォン', zh: '80,000韩元' },
+        price_100k: { ko: '100,000원', en: '₩100,000', ja: '100,000ウォン', zh: '100,000韩元' },
+        price_200k: { ko: '200,000원', en: '₩200,000', ja: '200,000ウォン', zh: '200,000韩元' },
+        opt_videoextra_name: { ko: '분량 초과 편집', en: 'Extended-Length Editing', ja: '尺超過編集', zh: '超时长剪辑' },
+        opt_videoextra_note: { ko: '100,000원/초', en: '₩100,000/second', ja: '100,000ウォン/秒', zh: '100,000韩元/秒' },
+        opt_resize_name: { ko: '포맷 리사이징', en: 'Format Resizing', ja: 'フォーマットリサイズ', zh: '画幅转换' },
+        opt_resize_note: {
+            ko: '가로↔세로 · 300,000원/편',
+            en: 'Horizontal↔vertical · ₩300,000/video',
+            ja: '横↔縦 · 300,000ウォン/本',
+            zh: '横竖版互转 · 300,000韩元/条'
+        },
+        opt_raw_name: { ko: '영상 원본(Raw) 제공', en: 'Raw Video Files', ja: '動画原本（Raw）提供', zh: '提供视频原始素材(Raw)' },
+        opt_raw_note: { ko: '패키지 금액의 30%', en: '30% of package price', ja: 'パッケージ金額の30%', zh: '套餐金额的30%' },
+        opt_overtime_name: { ko: '오버타임', en: 'Overtime', ja: '延長（オーバータイム）', zh: '加时' },
+        opt_overtime_note: { ko: '400,000원/시간', en: '₩400,000/hour', ja: '400,000ウォン/時間', zh: '400,000韩元/小时' },
+        opt_rush_name: { ko: '급행 납품', en: 'Rush Delivery', ja: '特急納品', zh: '加急交付' },
+        opt_rush_note: {
+            ko: '7영업일 단축 시 · 총 견적의 10%',
+            en: 'Cut delivery by 7 business days · +10% of total',
+            ja: '7営業日短縮 · 総額の10%',
+            zh: '缩短7个工作日 · 总额的10%'
+        },
+        opt_trip_seoul: { ko: '출장비 (서울권)', en: 'Travel Fee (Seoul)', ja: '出張費（ソウル圏）', zh: '差旅费（首尔地区）' },
+        opt_trip_gg: { ko: '출장비 (경기권)', en: 'Travel Fee (Gyeonggi)', ja: '出張費（京畿圏）', zh: '差旅费（京畿地区）' },
+        unit_cut: { ko: '컷', en: 'cuts', ja: 'カット', zh: '张' },
+        unit_sec: { ko: '초', en: 'sec', ja: '秒', zh: '秒' },
+        unit_video: { ko: '편', en: 'videos', ja: '本', zh: '条' },
+        unit_hour: { ko: '시간', en: 'hrs', ja: '時間', zh: '小时' },
+        pol_pay_h: { ko: '💳 결제 조건', en: '💳 Payment Terms', ja: '💳 支払条件', zh: '💳 付款条件' },
+        pol_pay_1: { ko: '예약금 50% 입금 시 일정 확정', en: 'Schedule confirmed upon 50% deposit', ja: '予約金50%の入金で日程確定', zh: '支付50%定金后确认档期' },
+        pol_pay_2: { ko: '잔금 50%는 납품 후 정산', en: 'Remaining 50% due after delivery', ja: '残金50%は納品後精算', zh: '尾款50%交付后结算' },
+        pol_pay_3: { ko: 'VAT 별도', en: 'VAT excluded', ja: 'VAT別途', zh: '增值税另计' },
+        pol_del_h: { ko: '📅 납품 일정', en: '📅 Delivery Schedule', ja: '📅 納品スケジュール', zh: '📅 交付时间' },
+        pol_del_1: { ko: '촬영 원본: 촬영 익일 전달', en: 'Originals: next day after the shoot', ja: '撮影原本：撮影翌日納品', zh: '拍摄原片：拍摄次日交付' },
+        pol_del_2: { ko: '리터칭/편집본: 약 7영업일', en: 'Retouched/edited files: approx. 7 business days', ja: 'レタッチ・編集本：約7営業日', zh: '修图/成片：约7个工作日' },
+        pol_del_3: { ko: '데이터 보관: 납품 후 1개월', en: 'Data retention: 1 month after delivery', ja: 'データ保管：納品後1ヶ月', zh: '数据保存：交付后1个月' },
+        pol_cancel_h: { ko: '🚫 취소 규정', en: '🚫 Cancellation Policy', ja: '🚫 キャンセル規定', zh: '🚫 取消规定' },
+        pol_cancel_1: { ko: '7일 전: 100% 환불', en: '7+ days before: 100% refund', ja: '7日前まで：100%返金', zh: '提前7天：全额退款' },
+        pol_cancel_2: { ko: '3일 전: 50% 환불', en: '3 days before: 50% refund', ja: '3日前：50%返金', zh: '提前3天：退款50%' },
+        pol_cancel_3: { ko: '전일/당일: 환불 불가', en: 'Day before / same day: no refund', ja: '前日・当日：返金不可', zh: '前一天/当天：不可退款' },
+        pol_copy_h: { ko: '©️ 저작권', en: '©️ Copyright', ja: '©️ 著作権', zh: '©️ 版权' },
+        pol_copy_p: {
+            ko: '온라인·인쇄물·사내 용도 영구 사용 가능<br> <span class="small">TVCF, 옥외광고, 해외 송출 시 별도 협의</span>',
+            en: 'Perpetual use for online, print, and internal purposes<br><span class="small">TV commercials, outdoor ads, and overseas distribution require separate agreement</span>',
+            ja: 'オンライン・印刷物・社内用途で永久使用可能<br><span class="small">TVCM・屋外広告・海外配信は別途協議</span>',
+            zh: '线上、印刷品及公司内部用途可永久使用<br><span class="small">电视广告、户外广告、海外投放需另行协商</span>'
+        },
+        s6_items: {
+            ko: '모델 섭외 · 헤어/메이크업 · 의상 스타일리스트 · 대형 세트/특수 장비 · 3D 제작 · 저작권 음악/폰트',
+            en: 'Model casting · Hair & makeup · Wardrobe stylist · Large sets / special equipment · 3D production · Licensed music / fonts',
+            ja: 'モデル手配 · ヘアメイク · 衣装スタイリスト · 大型セット／特殊機材 · 3D制作 · 著作権音楽／フォント',
+            zh: '模特邀约 · 发型化妆 · 服装造型师 · 大型布景/特殊设备 · 3D制作 · 版权音乐/字体'
+        },
+        s6_note: {
+            ko: '<strong>ℹ️ 참고</strong><br> · 본 견적은 기획(Creative Directing) 비용이 제외된 실행 견적입니다.<br> · 브랜드 측 레퍼런스와 톤앤매너를 기준으로 현장 연출 및 구현 중심으로 진행됩니다.<br> · 촬영 당일 현장 참관 가능 (인원/시간 제한 없음)',
+            en: '<strong>ℹ️ Note</strong><br>· This is an execution quote excluding creative directing fees.<br>· Shoots proceed on-site based on the brand\'s references and tone & manner.<br>· On-site attendance is welcome on the shoot day (no limit on headcount or hours)',
+            ja: '<strong>ℹ️ ご参考</strong><br>· 本見積は企画（クリエイティブディレクション）費用を除いた実施見積です。<br>· ブランド様のリファレンスとトーン＆マナーを基準に、現場での演出・実現を中心に進行します。<br>· 撮影当日の現場立ち会いが可能です（人数・時間の制限なし）',
+            zh: '<strong>ℹ️ 说明</strong><br>· 本报价为不含创意策划（Creative Directing）费用的执行报价。<br>· 以品牌方提供的参考及调性为基准，以现场执行为主进行拍摄。<br>· 拍摄当天欢迎到场跟拍（人数/时间不限）'
+        },
+        s7_intro: {
+            ko: '성수동 116평 규모의 상업 전문 스튜디오입니다.',
+            en: 'A 383㎡ professional commercial studio in Seongsu-dong, Seoul.',
+            ja: 'ソウル・聖水洞にある383㎡の商業撮影専門スタジオです。',
+            zh: '位于首尔圣水洞的383㎡专业商业摄影棚。'
+        },
+        gal_horizon: { ko: '대형 호리존', en: 'Large cyclorama', ja: '大型ホリゾント', zh: '大型天幕' },
+        gal_lounge: { ko: '라운지', en: 'Lounge', ja: 'ラウンジ', zh: '休息区' },
+        gal_makeup: { ko: '메이크업룸', en: 'Makeup room', ja: 'メイクルーム', zh: '化妆间' },
+        gal_ev: { ko: '화물 E/V', en: 'Freight elevator', ja: '貨物エレベーター', zh: '货运电梯' },
+        sf_1: { ko: '✓ 116평 대형 공간', en: '✓ 383㎡ spacious studio', ja: '✓ 383㎡の大空間', zh: '✓ 383㎡宽敞空间' },
+        sf_2: { ko: '✓ 대형 호리존', en: '✓ Large cyclorama', ja: '✓ 大型ホリゾント', zh: '✓ 大型天幕' },
+        sf_3: { ko: '✓ 화물 엘리베이터', en: '✓ Freight elevator', ja: '✓ 貨物エレベーター', zh: '✓ 货运电梯' },
+        sf_4: { ko: '✓ 주차 가능', en: '✓ Parking available', ja: '✓ 駐車可能', zh: '✓ 可停车' },
+        sf_5: { ko: '✓ 메이크업룸', en: '✓ Makeup room', ja: '✓ メイクルーム', zh: '✓ 化妆间' },
+        sf_6: { ko: '✓ 라운지', en: '✓ Lounge', ja: '✓ ラウンジ', zh: '✓ 休息区' },
+        form_title: { ko: '📋 견적 요청하기', en: '📋 Request a Quote', ja: '📋 見積のご依頼', zh: '📋 申请报价' },
+        schedule_btn: { ko: '📅 스케줄 확인하기', en: '📅 Check Availability', ja: '📅 スケジュールを確認', zh: '📅 查看档期' },
+        lbl_name: {
+            ko: '이름 <span class="required">*</span>',
+            en: 'Name <span class="required">*</span>',
+            ja: 'お名前 <span class="required">*</span>',
+            zh: '姓名 <span class="required">*</span>'
+        },
+        lbl_phone: {
+            ko: '연락처 <span class="required">*</span>',
+            en: 'Phone <span class="required">*</span>',
+            ja: '電話番号 <span class="required">*</span>',
+            zh: '联系电话 <span class="required">*</span>'
+        },
+        lbl_email: {
+            ko: '이메일 <span class="required">*</span>',
+            en: 'Email <span class="required">*</span>',
+            ja: 'メールアドレス <span class="required">*</span>',
+            zh: '邮箱 <span class="required">*</span>'
+        },
+        lbl_company: { ko: '회사/브랜드명', en: 'Company / Brand', ja: '会社名／ブランド名', zh: '公司/品牌名称' },
+        lbl_date: { ko: '희망 촬영일', en: 'Preferred Shoot Date', ja: '撮影希望日', zh: '期望拍摄日期' },
+        lbl_msg: { ko: '추가 요청사항', en: 'Additional Requests', ja: 'その他ご要望', zh: '其他需求' },
+        estimate_notice: {
+            ko: '⚠️ 본 견적은 <strong>예상 견적</strong>이며, 실제 상담 시 촬영 내용과 요구사항에 따라 달라질 수 있습니다.',
+            en: '⚠️ This is an <strong>estimated quote</strong>; final pricing may vary based on the actual scope and requirements.',
+            ja: '⚠️ 本見積は<strong>概算見積</strong>であり、実際のご相談内容・要件により変動する場合があります。',
+            zh: '⚠️ 本报价为<strong>预估报价</strong>，实际金额可能因拍摄内容及需求而有所调整。'
+        },
+        success_msg: {
+            ko: '✅ 견적 요청이 성공적으로 전송되었습니다!<br> 빠른 시일 내에 연락드리겠습니다.',
+            en: '✅ Your quote request has been sent!<br>We will get back to you shortly.',
+            ja: '✅ 見積依頼を送信しました！<br>早急にご連絡いたします。',
+            zh: '✅ 报价申请已发送！<br>我们会尽快与您联系。'
+        },
+        error_msg: {
+            ko: '❌ 전송 중 오류가 발생했습니다.<br> 이메일로 직접 문의해 주세요: taehyoungking@pewpewstudio.com',
+            en: '❌ An error occurred while sending.<br>Please email us directly: taehyoungking@pewpewstudio.com',
+            ja: '❌ 送信中にエラーが発生しました。<br>メールで直接お問い合わせください：taehyoungking@pewpewstudio.com',
+            zh: '❌ 发送时出现错误。<br>请直接发送邮件至：taehyoungking@pewpewstudio.com'
+        },
+        footer_contact: {
+            ko: '서울시 성동구 광나루로 204, 6층<br> <a href="mailto:taehyoungking@pewpewstudio.com">taehyoungking@pewpewstudio.com</a><br> <a href="https://www.instagram.com/pewpew_king/" target="_blank">@pewpew_king</a>',
+            en: '6F, 204 Gwangnaru-ro, Seongdong-gu, Seoul, Korea<br><a href="mailto:taehyoungking@pewpewstudio.com">taehyoungking@pewpewstudio.com</a><br><a href="https://www.instagram.com/pewpew_king/" target="_blank">@pewpew_king</a>',
+            ja: 'ソウル市城東区クァンナル路204、6階<br><a href="mailto:taehyoungking@pewpewstudio.com">taehyoungking@pewpewstudio.com</a><br><a href="https://www.instagram.com/pewpew_king/" target="_blank">@pewpew_king</a>',
+            zh: '韩国首尔市城东区广渡口路204号6层<br><a href="mailto:taehyoungking@pewpewstudio.com">taehyoungking@pewpewstudio.com</a><br><a href="https://www.instagram.com/pewpew_king/" target="_blank">@pewpew_king</a>'
+        },
+        footer_note: {
+            ko: '본 견적서의 유효기간은 발행일로부터 30일입니다.',
+            en: 'This quotation is valid for 30 days from the date of issue.',
+            ja: '本見積書の有効期間は発行日より30日です。',
+            zh: '本报价单自出具之日起30天内有效。'
+        }
+    };
+
+    const PP_ITEM_NAMES = {
+        '[사진] Half-day': { en: '[Photo] Half-day', ja: '[写真] Half-day', zh: '[照片] Half-day' },
+        '[사진] One-day': { en: '[Photo] One-day', ja: '[写真] One-day', zh: '[照片] One-day' },
+        '[영상] Half-day Standard': { en: '[Video] Half-day Standard', ja: '[動画] Half-day Standard', zh: '[视频] Half-day Standard' },
+        '[영상] One-day Standard': { en: '[Video] One-day Standard', ja: '[動画] One-day Standard', zh: '[视频] One-day Standard' },
+        '[사진+영상] Half-day Light All-in-One': { en: '[Photo+Video] Half-day Light All-in-One', ja: '[写真+動画] Half-day Light All-in-One', zh: '[照片+视频] Half-day Light All-in-One' },
+        '[사진+영상] Half-day Standard All-in-One': { en: '[Photo+Video] Half-day Standard All-in-One', ja: '[写真+動画] Half-day Standard All-in-One', zh: '[照片+视频] Half-day Standard All-in-One' },
+        '[사진+영상] One-day Standard All-in-One': { en: '[Photo+Video] One-day Standard All-in-One', ja: '[写真+動画] One-day Standard All-in-One', zh: '[照片+视频] One-day Standard All-in-One' },
+        '리터칭': { en: 'Retouching', ja: 'レタッチ', zh: '修图' },
+        '단체컷 리터칭': { en: 'Group-cut retouching', ja: '集合カットレタッチ', zh: '团体照修图' },
+        '누끼컷': { en: 'Cut-out', ja: '切り抜き', zh: '抠图' },
+        '특수재질 누끼컷': { en: 'Special-material cut-out', ja: '特殊素材切り抜き', zh: '特殊材质抠图' },
+        '분량 초과 편집': { en: 'Extended-length editing', ja: '尺超過編集', zh: '超时长剪辑' },
+        '포맷 리사이징': { en: 'Format resizing', ja: 'フォーマットリサイズ', zh: '画幅转换' },
+        '오버타임': { en: 'Overtime', ja: '延長', zh: '加时' },
+        '출장비 (서울권)': { en: 'Travel fee (Seoul)', ja: '出張費（ソウル圏）', zh: '差旅费（首尔）' },
+        '출장비 (경기권)': { en: 'Travel fee (Gyeonggi)', ja: '出張費（京畿圏）', zh: '差旅费（京畿）' }
+    };
+
+    const PP_T = {
+        title: { ko: 'PEWPEW STUDIO 견적표', en: 'PEWPEW STUDIO Quotation', ja: 'PEWPEW STUDIO お見積り', zh: 'PEWPEW STUDIO 报价单' },
+        won: { ko: '원', en: ' KRW', ja: 'ウォン', zh: '韩元' },
+        sending: { ko: '전송 중...', en: 'Sending...', ja: '送信中...', zh: '发送中...' },
+        sent: { ko: '전송 완료!', en: 'Sent!', ja: '送信完了！', zh: '已发送！' },
+        submit_btn: { ko: '견적 요청 보내기', en: 'Send Quote Request', ja: '見積を依頼する', zh: '提交报价申请' },
+        alert_min: {
+            ko: '최소 1개 이상의 패키지 또는 옵션을 선택해 주세요.',
+            en: 'Please select at least one package or option.',
+            ja: 'パッケージまたはオプションを1つ以上お選びください。',
+            zh: '请至少选择一个套餐或选项。'
+        },
+        none_floating: { ko: '선택된 항목 없음', en: 'No items selected', ja: '選択された項目なし', zh: '尚未选择项目' },
+        none_form: { ko: '선택된 항목이 없습니다', en: 'No items selected', ja: '選択された項目がありません', zh: '尚未选择任何项目' },
+        count_selected: {
+            ko: n => `${n}개 항목 선택됨`,
+            en: n => `${n} item${n > 1 ? 's' : ''} selected`,
+            ja: n => `${n}項目選択中`,
+            zh: n => `已选择${n}项`
+        },
+        times_suffix: { ko: '회', en: 'x', ja: '回', zh: '次' },
+        times_opt: {
+            ko: n => `${n}회`,
+            en: n => `${n} time${n > 1 ? 's' : ''}`,
+            ja: n => `${n}回`,
+            zh: n => `${n}次`
+        },
+        raw_plus: { ko: '영상 원본 제공', en: 'Raw video files', ja: '動画原本提供', zh: '视频原始素材' },
+        rush_plus: { ko: '급행 납품', en: 'Rush delivery', ja: '特急納品', zh: '加急交付' },
+        ph_name: { ko: '홍길동', en: 'John Smith', ja: '山田太郎', zh: '张三' },
+        ph_company: { ko: '회사 또는 브랜드명', en: 'Company or brand name', ja: '会社名またはブランド名', zh: '公司或品牌名称' },
+        ph_msg: {
+            ko: '촬영할 제품 종류, 특별 요청사항 등을 적어주세요',
+            en: 'Tell us about your products and any special requests',
+            ja: '撮影する製品の種類やご要望などをご記入ください',
+            zh: '请填写拍摄产品类型及特殊需求等'
+        }
+    };
+
+    let PP_LANG = localStorage.getItem('pp_lang') || 'ko';
+
+    // 정규화 후 한국어 원문 → 키 매핑을 만들어 요소에 태깅
+    (function tagElements() {
+        const norm = t => t.replace(/\s+/g, ' ').trim();
+        const koIndex = {};
+        for (const [k, v] of Object.entries(PP_I18N)) koIndex[norm(v.ko)] = k;
+        const SEL = '.floating-price .label, .go-form-btn, .studio-info, .doc-title, .section-title, ' +
+            '.time-label, .package-subtitle, .package-unit, .package-features li, .qty-selector label, ' +
+            '.tip-box, .option-group h4, .option-name, .option-note, .option-price, .qty-unit, ' +
+            '.policy-item h4, .policy-item li, .policy-item p, .section > p, .gallery-label, ' +
+            '.studio-features span, .quote-form-title, .total-label, .schedule-btn, ' +
+            '.form-group label, .estimate-notice, .message, .footer-contact, .footer-note';
+        document.querySelectorAll(SEL).forEach(el => {
+            const key = koIndex[norm(el.innerHTML)];
+            if (key) el.dataset.i18n = key;
+        });
+    })();
+
+    function ppLocalName(name) {
+        if (PP_LANG === 'ko') return name;
+        const m = PP_ITEM_NAMES[name];
+        return (m && m[PP_LANG]) || name;
+    }
+
+    // 다국어 지원 버전으로 재정의
+    function calculateTotal() {
+        let packageTotal = 0;
+        let optionTotal = 0;
+        let percentTotal = 0;
+        const selectedItems = [];
+
+        document.querySelectorAll('.package-card input[type="checkbox"]:checked').forEach(checkbox => {
+            const price = parseInt(checkbox.dataset.price) || 0;
+            const name = checkbox.dataset.name || '';
+            const qtySelector = document.getElementById('qty-' + checkbox.id);
+            let qty = 1;
+            if (qtySelector) {
+                const select = qtySelector.querySelector('select');
+                if (select) qty = parseInt(select.value) || 1;
+            }
+            packageTotal += price * qty;
+            if (name) {
+                const disp = ppLocalName(name);
+                selectedItems.push(qty > 1 ? `${disp} × ${qty}${PP_T.times_suffix[PP_LANG]}` : disp);
+            }
+        });
+
+        document.querySelectorAll('input[type="hidden"][data-qty]').forEach(input => {
+            const qty = parseInt(input.dataset.qty) || 0;
+            const price = parseInt(input.dataset.price) || 0;
+            const name = input.dataset.name || '';
+            if (qty > 0) {
+                optionTotal += price * qty;
+                selectedItems.push(PP_LANG === 'ko' ? `${name} ${qty}개` : `${ppLocalName(name)} × ${qty}`);
+            }
+        });
+
+        document.querySelectorAll('.option-item input[type="checkbox"]:checked').forEach(checkbox => {
+            const price = parseInt(checkbox.dataset.price) || 0;
+            const name = checkbox.dataset.name || '';
+            if (!checkbox.dataset.percent && price > 0) {
+                optionTotal += price;
+                if (name) selectedItems.push(ppLocalName(name));
+            }
+        });
+
+        const rawCheckbox = document.getElementById('opt-raw');
+        if (rawCheckbox && rawCheckbox.checked) {
+            const rawAmount = Math.round(packageTotal * (parseInt(rawCheckbox.dataset.percent) || 0) / 100);
+            percentTotal += rawAmount;
+            selectedItems.push(`${PP_T.raw_plus[PP_LANG]} (+${rawAmount.toLocaleString()}${PP_T.won[PP_LANG].trim()})`);
+        }
+
+        const rushCheckbox = document.getElementById('opt-rush');
+        if (rushCheckbox && rushCheckbox.checked) {
+            const baseTotal = packageTotal + optionTotal + percentTotal;
+            const rushAmount = Math.round(baseTotal * (parseInt(rushCheckbox.dataset.percent) || 0) / 100);
+            percentTotal += rushAmount;
+            selectedItems.push(`${PP_T.rush_plus[PP_LANG]} (+${rushAmount.toLocaleString()}${PP_T.won[PP_LANG].trim()})`);
+        }
+
+        const total = packageTotal + optionTotal + percentTotal;
+        document.getElementById('total-amount').textContent = total.toLocaleString('ko-KR');
+        document.getElementById('floating-total').textContent = total.toLocaleString('ko-KR');
+        document.getElementById('floating-count').textContent =
+            selectedItems.length > 0 ? PP_T.count_selected[PP_LANG](selectedItems.length) : PP_T.none_floating[PP_LANG];
+
+        const selectedItemsEl = document.getElementById('selected-items');
+        selectedItemsEl.textContent = selectedItems.length > 0 ? selectedItems.join(' / ') : PP_T.none_form[PP_LANG];
+
+        return { total, selectedItems, packageTotal };
+    }
+
+    function setLang(lang) {
+        PP_LANG = lang;
+        localStorage.setItem('pp_lang', lang);
+        document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
+        document.title = PP_T.title[lang];
+
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const entry = PP_I18N[el.dataset.i18n];
+            if (entry) el.innerHTML = entry[lang] || entry.ko;
+        });
+        document.querySelectorAll('.won').forEach(el => { el.textContent = PP_T.won[lang]; });
+        document.querySelectorAll('.qty-selector select option').forEach(o => {
+            o.textContent = PP_T.times_opt[lang](parseInt(o.value));
+        });
+        const phName = document.querySelector('input[name="name"]');
+        if (phName) phName.placeholder = PP_T.ph_name[lang];
+        const phCompany = document.querySelector('input[name="company"]');
+        if (phCompany) phCompany.placeholder = PP_T.ph_company[lang];
+        const phMsg = document.querySelector('textarea[name="message"]');
+        if (phMsg) phMsg.placeholder = PP_T.ph_msg[lang];
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn && !submitBtn.disabled) submitBtn.textContent = PP_T.submit_btn[lang];
+
+        document.querySelectorAll('.lang-switcher button').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.lang === lang);
+        });
+        calculateTotal();
+    }
+
+    document.querySelectorAll('.lang-switcher button').forEach(btn => {
+        btn.addEventListener('click', () => setLang(btn.dataset.lang));
+    });
+
+    if (PP_LANG !== 'ko') setLang(PP_LANG);
     </script>
 </body>
 </html>
